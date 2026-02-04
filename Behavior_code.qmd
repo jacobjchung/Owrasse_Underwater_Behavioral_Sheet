@@ -10,6 +10,10 @@ This quarto document contains the code used to visualize data from UW_Nest_Behav
 
 The data used was collected live underwater by SCUBA divers in Corsica, Fr, in a 10 minute period.
 
+# Tidy Code
+
+First run our library list (Install first if you don't have these packages).
+
 ```{r}
 #Install and library important packages
 #install.packages('ggplot2')
@@ -23,18 +27,24 @@ library(readxl)
 library(dplyr)
 ```
 
-Importing the data sheet, and checking
+Importing the data sheet
 
 ```{r}
 behavior_sheet <- read_excel("UW_Nest_Behavioral_Sheets_Cleaned.xlsx")
 head(behavior_sheet)
 ```
 
-Separating the date column for filtering ease later on.
+Separating the date column and placing it near the original Date column for filtering ease later on.
 
 ```{r eval=FALSE}
 behavior_sheet_date <- as.Date(behavior_sheet$Date)
 behavior_sheet$Date <- behavior_sheet_date
 behavior_sheet_sep <- behavior_sheet %>%
-  
+  mutate(Year = year(Date)) %>%
+  mutate(Month = month(Date)) %>%
+  mutate(Day = day(Date)) %>%
+  relocate(Year, .after = Date) %>%
+  relocate(Month, .after = Year) %>%
+  relocate(Day, .after = Month)
+head(behavior_sheet_sep)
 ```
