@@ -56,7 +56,17 @@ head(behavior_sheet_sep)
 For ease of comparison between years and months, this code will add up the total number of nests for each year.
 
 ```{r}
+yearly_totals <- behavior_sheet_sep |>
+  group_by(Year) |>
+  summarise(
+    total_nests = n(),
+    avg_SNKR = mean(`Average SNK`, na.rm = TRUE),
+    across(where(is.numeric) &
+             !c(Month, Day, `Average SNK`), 
+           ~ sum(.x, na.rm = TRUE))
+  )
 
+yearly_totals
 ```
 
 ## By male totals
