@@ -59,10 +59,15 @@ For ease of comparison between years and months, this code will add up the total
 yearly_totals <- behavior_sheet_sep |>
   group_by(Year) |>
   summarise(
+    # count the number of nests in each year
     total_nests = n(),
+    # take the avg of the "Average SNK" column for each year and make new column
     avg_SNKR = mean(`Average SNK`, na.rm = TRUE),
+          # include only numeric columns
     across(where(is.numeric) &
+             # exclude Month, Day, and Average SNKR column
              !c(Month, Day, `Average SNK`), 
+           # add up remaining totals per year for each column
            ~ sum(.x, na.rm = TRUE))
   )
 
