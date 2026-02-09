@@ -71,14 +71,140 @@ yearly_totals <- behavior_sheet_sep |>
            ~ sum(.x, na.rm = TRUE))
   )
 
-head(yearly_totals)
+yearly_totals
 ```
 
 ### Exploratory graphs looking between the years
 
-## By male totals
+#### Average sneakers between years
 
-For comparisons between the male reproductive tactics, this code will add up the total and create a new column for each of the variables by male (i.e. Column for total amount of Female visits by SAT, Column for total amount of SAT only spawns).
+```{r}
+
+```
+
+#### Average Nesting Male Time in/near nest between years
+
+```{r}
+
+```
+
+#### Average SAT presence between years
+
+```{r}
+
+```
+
+#### Total Female Visits between years
+
+```{r}
+
+```
+
+#### Total Female spawns between years
+
+```{r}
+
+```
+
+#### Total Nesting Male Spawns between years
+
+This graph adds up all the columns that indicate Nesting male spawns and compares between the years
+
+```{r}
+
+```
+
+#### Total Satellite Spawns between years
+
+This graph adds up all the columns that indicate Satellite spawns and compares between the years.
+
+```{r}
+
+```
+
+#### Total Sneaker Spawns between years
+
+This graph adds up all the columns that indicate Sneaker male spawns and compares between the years.
+
+```{r}
+
+```
+
+### Other, Not Year Specific, Exploratory graphs
+
+#### Female visits and Female Spawns
+
+Presumably, more visits should = more spawns is this true?
+
+```{r}
+
+```
+
+#### Nesting Male aggression effect on Female visits and spawns
+
+This adds up all the columns related to Nesting male aggression (Except aggression towards/away from nest, this will be graphed later) and looks for any correlation with female visits and spawns
+
+```{r}
+
+```
+
+#### Satellite Male aggression effect on Female Visits and Spawns
+
+This adds up all the columns related to Satellite male aggression (Except aggression towards/away from nest, this will be graphed later) and looks for any correlation with female visits and spawns
+
+```{r}
+
+```
+
+#### Satellite and Nesting Male aggression to Females, away and towards the nest
+
+We would expect any aggression to have negative impacts on female spawns, possibly also visits
+
+```{r}
+
+```
+
+#### Sneaker Presence and Female Visits
+
+From previous research it has been found that females use the presence of sneakers as a proxy for Nesting Male success, this graph will double check that
+
+```{r}
+
+```
+
+#### Positive interactions between Satellite and Nesting Male and Female Visits and Spawns
+
+This will add up the positive interactions occurring between the Satellite and Nesting Male (female passing)
+
+```{r}
+
+```
+
+#### Negative interactions between Satellite and Nesting Male and Female Visits and Spawn
+
+This does the same above, except with the negative interactions between Satellite and Nesting Male (SAT Submission to NM, NM aggression to SAT).
+
+```{r}
+
+```
+
+#### Satellite and Nesting male interactions against sneakers effect on Female Visits and Spawns
+
+Female prefer to not spawn with sneakers, thus higher Satellite and Nesting male aggression towards sneakers should increase the number of spawns. However, too many sneakers to chase means not enough time to spawn. This graph will let us see the relationship.
+
+```{r}
+
+```
+
+#### Nesting male courtship and Female Visits and Spawns
+
+```{r}
+
+```
+
+#### Does it matter who brings the female?
+
+These graphs will look at the relationship between which male type brings the female and female spawning.
 
 ```{r}
 
