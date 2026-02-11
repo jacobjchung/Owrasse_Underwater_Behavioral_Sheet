@@ -17,6 +17,7 @@ First run our library list (Install first if you don't have these packages).
 ```{r}
 #Install and library important packages
 #install.packages('ggplot2')
+#install.packages('RColorBrewer')
 #install.packages('here')
 #install.packages('tidyverse')
 #install.packages('readxl')
@@ -27,6 +28,7 @@ library(ggplot2)
 library(readxl)
 library(dplyr)
 library(brms)
+library(RColorBrewer)
 ```
 
 Importing the data sheet
@@ -72,6 +74,10 @@ yearly_totals <- behavior_sheet_sep |>
   )
 
 yearly_totals
+
+#Turn the year variable into a character for ease of comparison later on
+year_date <- as.character(yearly_totals$Year)
+yearly_totals$Year <- year_date
 ```
 
 ### Exploratory graphs looking between the years
@@ -79,7 +85,17 @@ yearly_totals
 #### Average sneakers between years
 
 ```{r}
-
+avg_snk_years <- yearly_totals |>
+  ggplot(aes(x = Year, y = avg_SNKR, fill = Year)) +
+           geom_bar(stat = 'identity') + 
+  scale_x_discrete(breaks = c(2017, 2018, 2019, 2022, 2023, 2024, 2025)) +
+  labs(x = 'Year', 
+       y = 'Average number of Sneakers',
+       title = "Number of Sneakers Between the Years") +
+  theme_classic() + 
+  theme(plot.title = element_text(hjust = 0.5)) +
+  scale_fill_brewer(palette = "Dark2")
+avg_snk_years
 ```
 
 #### Average Nesting Male Time in/near nest between years
