@@ -29,6 +29,7 @@ library(readxl)
 library(dplyr)
 library(brms)
 library(RColorBrewer)
+library(tibble)
 ```
 
 Importing the data sheet
@@ -58,6 +59,10 @@ head(behavior_sheet_sep)
 For ease of comparison between years and months, this code will add up the total number of nests for each year.
 
 ```{r}
+#Fix SAT submission to NM from chr to num
+sat_sub <- as.numeric(behavior_sheet_sep$`SAT submission to NM`)
+behavior_sheet_sep$`SAT submission to NM` <- sat_sub
+
 yearly_totals <- behavior_sheet_sep |>
   group_by(Year) |>
   summarise(
@@ -79,6 +84,17 @@ year_date <- as.character(yearly_totals$Year) #Creates a vector with years as ch
 yearly_totals$Year <- year_date #adjusts the tibble back
 
 head(yearly_totals) #Double Check
+```
+
+## Add Standard deviation columns
+
+```{r}
+yearly_totals_sd <- yearly_totals |>
+  group_by(Year) |>
+  across(where(is.numeric) & !c(Month, Day, `avg_SNK`),
+         )
+
+
 ```
 
 ### Exploratory graphs looking between the years
