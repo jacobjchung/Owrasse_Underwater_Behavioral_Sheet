@@ -86,17 +86,6 @@ yearly_totals$Year <- year_date #adjusts the tibble back
 head(yearly_totals) #Double Check
 ```
 
-## Add Standard deviation columns
-
-```{r}
-yearly_totals_sd <- yearly_totals |>
-  group_by(Year) |>
-  across(where(is.numeric) & !c(Month, Day, `avg_SNK`),
-         )
-
-
-```
-
 ### Exploratory graphs looking between the years
 
 #### Average sneakers between years
@@ -118,7 +107,26 @@ avg_snk_years
 #### Average Nesting Male Time in/near nest between years
 
 ```{r}
+NM_in_near <- yearly_totals |>
+  group_by(Year) |> #Focusing on per year
+  summarise(
+    #Get the total amount of time that the NM was recorded
+    total_time = round(sum(`# NM in` + `# NM near` + `# NM far`), digits = 4),
+    #Get the proportion of time the NM was in his nest.
+    NM_pro_in = round((`# NM in`/total_time)*100, digits = 4),
+    #Get the proportion of time the NM was near his nest.
+    NM_pro_near = round((`# NM near`/total_time)*100, digits = 4),
+    #Get the propotion of time the NM was far from his nest
+    NM_pro_far = round((`# NM far`/total_time)*100, digits = 4))
 
+NM_in_near.long <- NM_in_near %>% 
+  pivot_longer(cols = -c(Year, total_time),
+               names_to = "distance",
+               values_to = "perc_time")
+
+NM_in_near.long %>% 
+  ggplot(aes(Year, perc_time, fill = distance)) +
+  geom_col()
 ```
 
 #### Average SAT presence between years
