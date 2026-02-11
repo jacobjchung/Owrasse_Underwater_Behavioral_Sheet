@@ -70,14 +70,15 @@ yearly_totals <- behavior_sheet_sep |>
              # exclude Month, Day, and Average SNKR column
              !c(Month, Day, `Average SNK`), 
            # add up remaining totals per year for each column
-           ~ sum(.x, na.rm = TRUE))
-  )
+           ~ sum(.x, na.rm = TRUE)))
 
 yearly_totals
 
 #Turn the year variable into a character for ease of comparison later on
-year_date <- as.character(yearly_totals$Year)
-yearly_totals$Year <- year_date
+year_date <- as.character(yearly_totals$Year) #Creates a vector with years as chr
+yearly_totals$Year <- year_date #adjusts the tibble back
+
+head(yearly_totals) #Double Check
 ```
 
 ### Exploratory graphs looking between the years
@@ -86,15 +87,15 @@ yearly_totals$Year <- year_date
 
 ```{r}
 avg_snk_years <- yearly_totals |>
-  ggplot(aes(x = Year, y = avg_SNKR, fill = Year)) +
+  ggplot(aes(x = Year, y = avg_SNKR, fill = Year)) + #gives ggplot the dimensions
            geom_bar(stat = 'identity') + 
-  scale_x_discrete(breaks = c(2017, 2018, 2019, 2022, 2023, 2024, 2025)) +
+  scale_x_discrete(breaks = c(2017, 2018, 2019, 2022, 2023, 2024, 2025)) + #Marks the x axis ticks
   labs(x = 'Year', 
        y = 'Average number of Sneakers',
-       title = "Number of Sneakers Between the Years") +
+       title = "Number of Sneakers Between the Years") + #edits axis and title labels
   theme_classic() + 
-  theme(plot.title = element_text(hjust = 0.5)) +
-  scale_fill_brewer(palette = "Dark2")
+  theme(plot.title = element_text(hjust = 0.5)) + #Moves title to the middle
+  scale_fill_brewer(palette = "Dark2") #Colors the bars
 avg_snk_years
 ```
 
