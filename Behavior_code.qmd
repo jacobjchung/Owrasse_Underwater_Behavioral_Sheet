@@ -41,7 +41,7 @@ head(behavior_sheet)
 
 Separating the date column and placing it near the original Date column for filtering ease later on.
 
-```{r eval=FALSE}
+```{r}
 behavior_sheet_date <- as.Date(behavior_sheet$Date)
 behavior_sheet$Date <- behavior_sheet_date
 behavior_sheet_sep <- behavior_sheet %>%
@@ -81,7 +81,7 @@ yearly_totals
 
 #Turn the year variable into a character for ease of comparison later on
 year_date <- as.character(yearly_totals$Year) #Creates a vector with years as chr
-yearly_totals$Year <- year_date #adjusts the tibble back
+yearly_totals$Year_axis <- year_date #creates a new variable for ease of graphing later on
 
 head(yearly_totals) #Double Check
 ```
@@ -92,12 +92,13 @@ head(yearly_totals) #Double Check
 
 ```{r}
 avg_snk_years <- yearly_totals |>
-  ggplot(aes(x = Year, y = avg_SNKR, fill = Year)) + #gives ggplot the dimensions
-           geom_bar(stat = 'identity') + 
-  scale_x_discrete(breaks = c(2017, 2018, 2019, 2022, 2023, 2024, 2025)) + #Marks the x axis ticks
+  ggplot(aes(x = Year_axis, y = avg_SNKR, fill = Year_axis)) + #gives ggplot the dimensions
+  geom_bar(stat = 'identity') + 
   labs(x = 'Year', 
        y = 'Average number of Sneakers',
-       title = "Number of Sneakers Between the Years") + #edits axis and title labels
+       title = "Number of Sneakers Between the Years",
+       fill = 'Year
+       ') + #edits axis and title labels
   theme_classic() + 
   theme(plot.title = element_text(hjust = 0.5)) + #Moves title to the middle
   scale_fill_brewer(palette = "Dark2") #Colors the bars
@@ -108,67 +109,231 @@ avg_snk_years
 
 ```{r}
 NM_in_near <- yearly_totals |>
-  group_by(Year) |> #Focusing on per year
+  group_by(Year_axis) |> #Focusing on per year
   summarise(
     #Get the total amount of time that the NM was recorded
     total_time = round(sum(`# NM in` + `# NM near` + `# NM far`), digits = 4),
-    #Get the proportion of time the NM was in his nest.
-    NM_pro_in = round((`# NM in`/total_time)*100, digits = 4),
-    #Get the proportion of time the NM was near his nest.
-    NM_pro_near = round((`# NM near`/total_time)*100, digits = 4),
-    #Get the propotion of time the NM was far from his nest
-    NM_pro_far = round((`# NM far`/total_time)*100, digits = 4))
+    #Get the percent of time the NM was in his nest.
+    NM_in = round((`# NM in`/total_time)*100, digits = 4),
+    #Get the percent of time the NM was near his nest.
+    NM_near = round((`# NM near`/total_time)*100, digits = 4),
+    #Get the percent of time the NM was far from his nest
+    NM_far = round((`# NM far`/total_time)*100, digits = 4))
 
 NM_in_near.long <- NM_in_near %>% 
-  pivot_longer(cols = -c(Year, total_time),
-               names_to = "distance",
-               values_to = "perc_time")
+  pivot_longer(cols = -c(Year_axis, total_time), #Take all tibble coloumns except Years and total time
+               names_to = "distance", # Put the percent coloumns into their own
+               values_to = "perc_time") #Put previous' columns into a new one
 
-NM_in_near.long %>% 
-  ggplot(aes(Year, perc_time, fill = distance)) +
-  geom_col()
+
+NM_in_near.long %>%
+  ggplot(aes(Year_axis, perc_time, fill = distance)) +
+  geom_col() +
+    labs(x = 'Year', 
+       y = 'Percent of time',
+       title = "Percent of time the Nesting male spent around his nest",
+       fill = 'Distance') + #edits axis and title labels
+  theme_classic() + 
+  theme(plot.title = element_text(hjust = 0.5)) + #Moves title to the middle
+  scale_fill_brewer(palette = "Dark2") #Colors the bars
+
+  
 ```
 
-#### Average SAT presence between years
+#### Average SAT Presence at the Nest between years per nest
 
 ```{r}
+SAT.presence <- yearly_totals |>
+  mutate('SatP_perN' = (`# SAT Present`/total_nests)*10, .after = 7) #creates the column with the percentage, multiplied by 10 to get to percentage
 
+SAT.presence.plot <- SAT.presence |>
+  ggplot(aes(Year_axis, SatP_perN, fill = Year_axis)) +
+  geom_bar(stat = 'identity') +
+  labs(x = 'Year', 
+       y = 'Average Sat presence per nest',
+       title = "Percent of time the Satellite was present at a Nest",
+       fill = 'Year') +  #edits axis and title labels
+  theme_classic() + 
+  theme(plot.title = element_text(hjust = 0.5)) + #Moves title to the middle
+  scale_fill_brewer(palette = "Dark2") #Colors the bars
+
+SAT.presence.plot
 ```
 
-#### Total Female Visits between years
+#### Average Female Visits per nest between years
 
 ```{r}
+T_female_visits <- yearly_totals |>
+  mutate('visits_p_nest' = (`Total Female Visits`)/total_nests) |>
+  ggplot(aes(Year_axis, visits_p_nest, fill = Year_axis)) +
+  geom_col() +
+  labs(x = 'Year', 
+      y = 'Female visits per nest',
+      title = "Average Female visits per nest between years",
+      fill = 'Year') +  #edits axis and title labels
+  theme_classic() + 
+  theme(plot.title = element_text(hjust = 0.5)) + #Moves title to the middle
+  scale_fill_brewer(palette = "Dark2") #Colors the bars
+  
 
+T_female_visits
 ```
 
-#### Total Female spawns between years
+#### Average Female spawns between years
+
+This is different from the next graph, because this is the number of females that spawned. So each female is only counted once, while females can spawn multiple times (which went to the total variable).
 
 ```{r}
-
+A_female_spawns <- yearly_totals |>
+  #Gets average total female spawns between the years
+  mutate('avg_fspawns_nest' = (`Total Female Spawning`)/total_nests) |>
+  ggplot(aes(Year_axis, avg_fspawns_nest, fill = Year_axis)) +
+  geom_col() +
+  labs(x = 'Year', 
+      y = 'Number of Females spawn per nest',
+      title = "Average number of Female that spawn per nest between years",
+      fill = 'Year') +  #edits axis and title labels
+  theme_classic() + 
+  theme(plot.title = element_text(hjust = 0.5)) + #Moves title to the middle
+  scale_fill_brewer(palette = "Dark2") #Colors the bars
+  
+A_female_spawns
 ```
 
-#### Total Nesting Male Spawns between years
-
-This graph adds up all the columns that indicate Nesting male spawns and compares between the years
+#### Average Total spawns between years
 
 ```{r}
+T_total_spawns <- yearly_totals |>
+  #Creates the column of total spawns per nest
+  mutate('total_spawns_p_nest' = (`Total Spawns`)/total_nests) |>
+  #Creates the plot
+  ggplot(aes(Year_axis, total_spawns_p_nest, fill = Year_axis)) +
+  geom_col() +
+  labs(x = 'Year', 
+      y = 'Total spawns per nest',
+      title = "Average Total spawns per nest between years",
+      fill = 'Year') +  #edits axis and title labels
+  theme_classic() + 
+  theme(plot.title = element_text(hjust = 0.5)) + #Moves title to the middle
+  scale_fill_brewer(palette = "Dark2") #Colors the bars
+  
 
+T_total_spawns
+```
+
+#### Average Total Nesting Male Spawns between years
+
+This graph adds up all the columns that indicate Nesting male spawns and compares the averages between the years
+
+```{r}
+T_NM_spawns <- yearly_totals |>
+  #Average total nesting male spawns 
+  mutate('total_NM_spawns' = (`Total Spawns NM brought` + `Total spawns SAT passed to NM` + `Total Spawns SAT Brought` + `Total Spawns SNK brought`)/total_nests) |>
+  ggplot(aes(Year_axis, total_NM_spawns, fill = Year_axis)) +
+  geom_col() +
+  labs(x = 'Year', 
+      y = 'Total NM spawns per nest',
+      title = "Average Total Nesting Male spawns per nest between years",
+      fill = 'Year') +  #edits axis and title labels
+  theme_classic() + 
+  theme(plot.title = element_text(hjust = 0.5)) + #Moves title to the middle
+  scale_fill_brewer(palette = "Dark2") #Colors the bars  
+  
+T_NM_spawns
 ```
 
 #### Total Satellite Spawns between years
 
-This graph adds up all the columns that indicate Satellite spawns and compares between the years.
+This graph adds up all the columns that indicate Satellite spawns and compares between the years. Note, this is counting when the Satellite is *allowed* to spawn at the nest by the Nesting male.
 
 ```{r}
+T_SAT_spawns <- yearly_totals |>
+  mutate('T_SAT_spawn' = (`Total spawns NM brought, SAT only spawn` + `Total spawns SAT passed to NM but SAT only spawn` + `Total Spawns SAT brought, SAT only spawn`)/total_nests) |>
+  ggplot(aes(Year_axis, T_SAT_spawn, fill = Year_axis)) +
+  geom_col() +
+  labs(x = 'Year', 
+      y = 'Total SAT spawns per nest',
+      title = "Average Total Satellite Male shared spawns per nest between years",
+      fill = 'Year') +  #edits axis and title labels
+  theme_classic() + 
+  theme(plot.title = element_text(hjust = 0.5)) + #Moves title to the middle
+  scale_fill_brewer(palette = "Dark2") #Colors the bars  
+  
+T_SAT_spawns
+```
 
+This graph will count Satellite *sneak* spawns (note this does include sneaker sneaks).
+
+```{r}
+T_SAT_sneaks <- yearly_totals |>
+  mutate('T_SAT_sneak' = (`Female visit NM brought, Sneaks SAT + SNK` + `Female visit NM brought, Sneaks SAT only` + `Female visit SAT pass NM, Sneaks SAT + SNK` + `Female visit SAT pass NM, Sneak SAT only` + `Female visit SAT only, Sneaks SAT + SNK` + `Female visit SAT only, Sneaks SAT only` + `Female visit SNK only, Sneaks SAT + SNK` + `Female visit SNK only, Sneaks SAT only`)/total_nests) |>
+  ggplot(aes(Year_axis, T_SAT_sneak, fill = Year_axis)) +
+  geom_col() +
+  labs(x = 'Year', 
+      y = 'Total SAT spawns per nest',
+      title = "Average Total Satellite Male sneak spawns per nest between years",
+      fill = 'Year') +  #edits axis and title labels
+  theme_classic() + 
+  theme(plot.title = element_text(hjust = 0.5)) + #Moves title to the middle
+  scale_fill_brewer(palette = "Dark2") #Colors the bars  
+  
+T_SAT_sneaks
+```
+
+This graph will do total SAT spawns, both shared and sneak
+
+```{r}
+T_SAT_spawns_both <- yearly_totals |>
+  mutate('T_SAT_spawn_both' = (`Total spawns NM brought, SAT only spawn` + `Total spawns SAT passed to NM but SAT only spawn` + `Total Spawns SAT brought, SAT only spawn` + `Female visit NM brought, Sneaks SAT + SNK` + `Female visit NM brought, Sneaks SAT only` + `Female visit SAT pass NM, Sneaks SAT + SNK` + `Female visit SAT pass NM, Sneak SAT only` + `Female visit SAT only, Sneaks SAT + SNK` + `Female visit SAT only, Sneaks SAT only` + `Female visit SNK only, Sneaks SAT + SNK` + `Female visit SNK only, Sneaks SAT only`)/total_nests) |>
+  ggplot(aes(Year_axis, T_SAT_spawn_both, fill = Year_axis)) +
+  geom_col() +
+  labs(x = 'Year', 
+      y = 'Total SAT spawns per nest',
+      title = "Average Total Satellite Male spawns per nest between years",
+      fill = 'Year') +  #edits axis and title labels
+  theme_classic() + 
+  theme(plot.title = element_text(hjust = 0.5)) + #Moves title to the middle
+  scale_fill_brewer(palette = "Dark2") #Colors the bars  
+  
+T_SAT_spawns_both
 ```
 
 #### Total Sneaker Spawns between years
 
-This graph adds up all the columns that indicate Sneaker male spawns and compares between the years.
+This graph adds up all the columns that indicate Sneaker male spawns and compares between the years. Note, some sneaks are including SAT sneaks
 
 ```{r}
+T_SNK_spawns <- yearly_totals |>
+  mutate('total_sneaks' = (`Total Spawns SNK brought, SNK only spawn` + `Female visit NM brought, Sneaks SAT + SNK` + `Female visit NM brought, Sneaks SNK only` + `Female visit SAT pass NM, Sneaks SAT + SNK` + `Female visit SAT pass NM, Sneak SNK only` + `Female visit SAT only, Sneaks SAT + SNK` + `Female visit SAT only, Sneaks SNK only` + `Female visit SNK only, Sneaks SAT + SNK` + `Female visit SNK only, Sneaks SNK only`)/total_nests) |>
+  ggplot(aes(Year_axis, total_sneaks, fill = Year_axis)) +
+  geom_col() +
+  labs(x = 'Year', 
+      y = 'Total Sneaker spawns per nest',
+      title = "Average Total Sneaker Male spawns per nest between years",
+      fill = 'Year') +  #edits axis and title labels
+  theme_classic() + 
+  theme(plot.title = element_text(hjust = 0.5)) + #Moves title to the middle
+  scale_fill_brewer(palette = "Dark2") #Colors the bars 
 
+T_SNK_spawns
+```
+
+Graph is for sneakers only
+
+```{r}
+T_SNK_spawns_only <- yearly_totals |>
+  mutate('total_sneaks_only' = (`Total Spawns SNK brought, SNK only spawn`+ `Female visit NM brought, Sneaks SNK only` +`Female visit SAT pass NM, Sneak SNK only` + `Female visit SAT only, Sneaks SNK only` + `Female visit SNK only, Sneaks SNK only`)/total_nests) |>
+  ggplot(aes(Year_axis, total_sneaks_only, fill = Year_axis)) +
+  geom_col() +
+  labs(x = 'Year', 
+      y = 'Total Sneaker only spawns per nest',
+      title = "Average Total Sneaker Male spawns per nest between years",
+      fill = 'Year') +  #edits axis and title labels
+  theme_classic() + 
+  theme(plot.title = element_text(hjust = 0.5)) + #Moves title to the middle
+  scale_fill_brewer(palette = "Dark2") #Colors the bars 
+
+T_SNK_spawns_only
 ```
 
 ### Other, Not Year Specific, Exploratory graphs
