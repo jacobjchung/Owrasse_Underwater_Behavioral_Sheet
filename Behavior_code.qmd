@@ -20,9 +20,11 @@ First run our library list (Install first if you don't have these packages).
 #install.packages('RColorBrewer')
 #install.packages('here')
 #install.packages('tidyverse')
+#install.packages('janitor')
 #install.packages('readxl')
 #install.packages('brms')
 library(tidyverse)
+library(janitor)
 library(here)
 library(ggplot2)
 library(readxl)
@@ -32,14 +34,14 @@ library(RColorBrewer)
 library(tibble)
 ```
 
-Importing the data sheet
+### Importing the data sheet
 
 ```{r}
 behavior_sheet <- read_excel("UW_Nest_Behavioral_Sheets_Cleaned.xlsx")
 head(behavior_sheet)
 ```
 
-Separating the date column and placing it near the original Date column for filtering ease later on.
+### Separating the date column and placing it near the original Date column for filtering ease later on.
 
 ```{r}
 behavior_sheet_date <- as.Date(behavior_sheet$Date)
@@ -62,6 +64,15 @@ behavior_sheet_sep$`SNK submission to SAT` <- snk_sub
 #Same for NM aggression to SAT
 NM_aggsat <- as.numeric(behavior_sheet_sep$`NM aggression to SAT`)
 behavior_sheet_sep$`NM aggression to SAT` <- NM_aggsat
+```
+
+### Create a tibble with cleaned names
+
+This chunk will be useful when creating and running models later on because it "standardizes" the column names.
+
+```{r}
+behavior_sheet_cln <- behavior_sheet_sep |>
+  clean_names()
 ```
 
 ## Year totals
@@ -368,13 +379,11 @@ f_visits_spawns
 ##### This is the exploratory model
 
 ```{r}
-#Changing the format of the columns to work with brms
-f.tpsawns.tvisits <- rename(behavior_sheet_sep, total.spawns = 'Total Spawns', total.female.visits = 'Total Female Visits')
 
 #Total spawns as a function of total female visits
-f.tspawns.tvisits.mdl <- brm(data = f.tpsawns.tvisits,
+f.tspawns.tvisits.mdl <- brm(data = behavior_sheet_cln,
       family = gaussian,
-      total.spawns ~ total.female.visits,
+      total_spawns ~ total_female_visits,
       iter = 2000, warmup = 1000, chains = 4, cores = 4,
       seed = 4,
       file = 'output/f.tspawns.tvisits')
