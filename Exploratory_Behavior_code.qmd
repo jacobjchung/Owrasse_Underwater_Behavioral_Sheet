@@ -392,7 +392,7 @@ f.tspawns.tvisits.mdl <- brm(data = behavior_sheet_cln, #Gives the model the tib
       total_spawns ~ total_female_visits, #specifying the model
       iter = 2000, warmup = 1000, chains = 4, cores = 4, #Specifying Markov chain parameters
       seed = 4, #Determines which random numbers will get sampled
-      file = 'output/f.tspawns.tvisits') #Saves the model as an object for outputting later
+      file = 'Exploratory model outputs/f.tspawns.tvisits') #Saves the model as an object for outputting later
 
 summary(f.tspawns.tvisits.mdl) #Gives us model summary
 plot(f.tspawns.tvisits.mdl) #plots the Markov chains
@@ -440,7 +440,7 @@ fvisits.nmagg.mdl <-
       total_female_visits ~ total_nm_agg, #Specifying the model
       iter = 2000, warmup = 1000, chains = 4, cores = 4, #Markov chain parameters
       seed = 4, #Determines which random numbers
-      file = 'output/fvisits.nmagg.mdl') #saves it as an output
+      file = 'Exploratory model outputs/fvisits.nmagg.mdl') #saves it as an output
 
 summary(fvisits.nmagg.mdl)
 plot(fvisits.nmagg.mdl)
@@ -480,7 +480,7 @@ f.spawns.nmagg.mdl <-
       total_spawns ~ total_nm_agg, #Specifying the model
       iter = 2000, warmup = 1000, chains = 4, cores = 4, #Markov chain parameters
       seed = 4, #Determines which random numbers
-      file = 'output/f.visits.nmagg.mdl') #saves it as an output
+      file = 'Exploratory model outputs/f.visits.nmagg.mdl') #saves it as an output
 
 summary(f.spawns.nmagg.mdl) #Gives a summary of the model
 plot(f.spawns.nmagg.mdl) #Plots the chains
@@ -521,7 +521,7 @@ f.visits.satagg.mdl <-
       total_female_visits ~ sat_aggression_to_snk, #Specifying the model
       iter = 2000, warmup = 1000, chains = 4, cores = 4, #Markov chain parameters
       seed = 4, #Determines which random numbers
-      file = 'output/f.visits.satagg.mdl') #saves it as an output
+      file = 'Exploratory model outputs/f.visits.satagg.mdl') #saves it as an output
 
 summary(f.visits.satagg.mdl)
 plot(f.visits.satagg.mdl)
@@ -554,7 +554,7 @@ f.spawns.satagg.mdl <-
       total_spawns ~ sat_aggression_to_snk, #Specifying the model
       iter = 2000, warmup = 1000, chains = 4, cores = 4, #Markov chain parameters
       seed = 4, #Determines which random numbers
-      file = 'output/f.spawns.satagg.mdl') #saves it as an output
+      file = 'Exploratory model outputs/f.spawns.satagg.mdl') #saves it as an output
 
 summary(f.spawns.satagg.mdl)
 plot(f.spawns.satagg.mdl)
