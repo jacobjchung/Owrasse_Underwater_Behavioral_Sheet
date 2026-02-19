@@ -575,7 +575,7 @@ f.v.nestsat.agg2nest <-
       total_female_visits ~ nm_aggression_to_female_towards_nest + sat_aggression_to_female_towards_nest, #Specifying the model
       iter = 2000, warmup = 1000, chains = 4, cores = 4, #Markov chain parameters
       seed = 4, #Determines which random numbers
-      file = 'output/f.v.nestsat.agg2nest') #saves it as an output
+      file = 'Exploratory model outputs/f.v.nestsat.agg2nest') #saves it as an output
 
 summary(f.v.nestsat.agg2nest)
 plot(f.v.nestsat.agg2nest)
@@ -590,7 +590,7 @@ f.s.nestsat.agg2nest <-
       total_spawns ~ nm_aggression_to_female_towards_nest + sat_aggression_to_female_towards_nest, #Specifying the model
       iter = 2000, warmup = 1000, chains = 4, cores = 4, #Markov chain parameters
       seed = 4, #Determines which random numbers
-      file = 'output/f.s.nestsat.agg2nest') #saves it as an output
+      file = 'Exploratory model outputs/f.s.nestsat.agg2nest') #saves it as an output
 
 summary(f.s.nestsat.agg2nest)
 plot(f.s.nestsat.agg2nest)
@@ -605,7 +605,7 @@ f.v.nestsat.aggawaynest <-
       total_female_visits ~ nm_aggresion_to_female_away_from_nest, #Specifying the model
       iter = 2000, warmup = 1000, chains = 4, cores = 4, #Markov chain parameters
       seed = 4, #Determines which random numbers
-      file = 'output/f.v.nestsat.aggawaynest') #saves it as an output
+      file = 'Exploratory model outputs/f.v.nestsat.aggawaynest') #saves it as an output
 
 summary(f.v.nestsat.aggawaynest)
 plot(f.v.nestsat.aggawaynest)
@@ -620,7 +620,7 @@ f.s.nestsat.aggawaynest <-
       total_spawns ~ nm_aggresion_to_female_away_from_nest, #Specifying the model
       iter = 2000, warmup = 1000, chains = 4, cores = 4, #Markov chain parameters
       seed = 4, #Determines which random numbers
-      file = 'output/f.s.nestsat.aggawaynest') #saves it as an output
+      file = 'Exploratory model outputs/f.s.nestsat.aggawaynest') #saves it as an output
 
 summary(f.s.nestsat.aggawaynest)
 plot(f.s.nestsat.aggawaynest)
