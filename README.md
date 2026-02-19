@@ -21,7 +21,7 @@ Social information has been found to have a significant impact across species wi
 
 Enter *Symphodus ocellatus* a small wrasse that is found throughout the Mediterranean, Eastern Altantic, and Black Sea.
 
-![Picture of the Wrasse](Ocellated_Wrasse_Image.jpeg)
+![Picture of the Wrasse](Images/Ocellated_Wrasse_Image.jpeg)
 Artist credit: Clara Lacy
 
 
@@ -37,7 +37,7 @@ Interestingly enough, there are no known genetic determiners of which male an in
 
 If the multiple reproductive tactics weren't cool enough, there are also high levels of mate choice copying in this species. Nesting males are likely to be successful if a female observes other females spawning with or being around him and his nest. There are no known male traits or nest characteristics that drive female mate choice. Thus the social environment places a large role in the mate choice decision making process in this species.
 
-![Alonzo 2008 figure](Alonzo_2008_Owrasse.png)
+![Alonzo 2008 figure](Images/Alonzo_2008_Owrasse.png)
 Reference: Alonzo, S. H. (2008). Female mate choice copying affects sexual selection in wild populations of the ocellated wrasse. Animal Behaviour, 75(5), 1715–1723. https://doi.org/10.1016/j.anbehav.2007.09.031
 
 The multiple male reproductive tactics and large amounts of mate choice copying in *S. ocellatus*, provide researchers the opportunity to observe the influencing effects of the social environment on chooser decision making!
