@@ -6,9 +6,12 @@ The overarching question that motivates this project is, "What role does complex
   How does the social environment influence female mate choice in *Symphodus ocellatus*?
   
   Are there major factors, or combination of factors, that female *S. ocellatus* use to make their mating decisions?
-  
+ 
 ## Rationale
 Mate choice plays a major role in the evolution of species, yet historically, research has focused on using the presence/absense of preferences in the choosing sex (in sexual reproductive systems) to explain the evolution of complex phenotyes and traits. However, in the last decade, behavioral research has shown that decision making is highly individualistic, with multiple factors (behavioral syndromes, developmental history, social ifluence to name a few) influencing differences in decision making between individuals(Rosenthal 2017). With mate choice being a type of decision making within choosing individuals, our usage of merely the presence/absence of mate preferences no longer makes the cut. Thus, this research sets out to understand the role of the social environment on the complex decision making process of mate choice.
+
+## Target audience
+Our target audience for this analysis is early year undergrads who are interested in getting research experience.
 
 ## Background Information
 One consequence for being alive is dealing with trade-offs. Every choice that an individual is faced with has trade-offs between the options available to them. A key consequence that comes with trade-offs is the fitness cost(s) that come with the decision made. And these fitness costs can be directly selected for by both natural and sexual selection. Thus evolution is tightly connected to how individuals interact with these trade-offs. This means that understanding how individuals interact with trade-offs is crucial to understanding the processes of evolution.
