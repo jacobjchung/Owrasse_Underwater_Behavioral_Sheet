@@ -638,13 +638,31 @@ From previous research it has been found that females use the presence of sneake
 ##### Female visits as a function of number of sneakers at a nest
 
 ```{r}
+f.v.snkr.at.nest <-
+  brm(data = behavior_sheet_cln, #Give the model the tibble
+      family = gaussian, #Tell model what type of distribution
+      total_female_visits ~ average_snk, #Specifying the model
+      iter = 2000, warmup = 1000, chains = 4, cores = 4, #Markov chain parameters
+      seed = 4, #Determines which random numbers
+      file = 'Exploratory model outputs/f.v.snkr.at.nest') #saves it as an output
 
+summary(f.v.snkr.at.nest)
+plot(f.v.snkr.at.nest)
 ```
 
 ##### Female spawns as a function of number of sneakers at a nest
 
 ```{r}
+f.s.snkr.at.nest <-
+  brm(data = behavior_sheet_cln, #Give the model the tibble
+      family = gaussian, #Tell model what type of distribution
+      total_spawns ~ average_snk, #Specifying the model
+      iter = 2000, warmup = 1000, chains = 4, cores = 4, #Markov chain parameters
+      seed = 4, #Determines which random numbers
+      file = 'Exploratory model outputs/f.s.snkr.at.nest') #saves it as an output
 
+summary(f.s.snkr.at.nest)
+plot(f.s.snkr.at.nest)
 ```
 
 #### Positive interactions between Satellite and Nesting Male and Female Visits and Spawns
