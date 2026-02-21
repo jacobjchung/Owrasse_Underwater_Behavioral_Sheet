@@ -20,6 +20,7 @@ First run our library list (Install first if you don't have these packages).
 #install.packages('ggeffects')
 #install.packages('RColorBrewer')
 #install.packages('here')
+#install.packages('MASS')
 #install.packages('tidyverse')
 #install.packages('janitor')
 #install.packages('readxl')
@@ -34,6 +35,7 @@ library(dplyr)
 library(brms)
 library(RColorBrewer)
 library(tibble)
+library(MASS)
 ```
 
 ### Importing the data sheet
@@ -76,6 +78,10 @@ This chunk will be useful when creating and running models later on because it "
 behavior_sheet_cln <- behavior_sheet_sep |>
   #Uses the Janitor package to standardize the names
   clean_names()
+
+#Turn the year variable into a character for ease of comparison later on
+year_date <- as.character(behavior_sheet_cln$year) #Creates a vector with years as chr
+behavior_sheet_cln$year <- year_date #creates a new variable for ease of graphing later on
 ```
 
 ## Year totals
@@ -372,10 +378,10 @@ Presumably, more visits should = more spawns is this true? We use total female v
 ##### This is the exploratory graph
 
 ```{r}
-f_visits_spawns <- behavior_sheet_sep |>
-  ggplot(aes(`Total Female Visits`, `Total Spawns`)) + #gives ggplot dimensions
+f_visits_spawns <- behavior_sheet_cln |>
+  ggplot(aes(total_female_visits, total_spawns, color = year )) + #gives ggplot dimensions
   geom_point() + #makes the plot a scatterplot
-  geom_smooth() +  #Add a linear model line for visualization
+  geom_smooth(aes(color = 'Negative Binomial'), se = TRUE, method = 'glm.nb') +  #Add a linear model line for visualization
   labs(title = 'Total Spawns as Function of Total Female Visits') +
   theme_classic() + #Sets the plot visuals
   theme(plot.title = element_text(hjust = 0.5)) #Moves title to the middle
