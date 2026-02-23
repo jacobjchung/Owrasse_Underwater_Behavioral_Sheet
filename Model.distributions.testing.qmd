@@ -104,3 +104,83 @@ pp_check(f.tfspawns.tvisits.pmdl)
 summary(f.tfspawns.tvisits.pmdl) #Gives us model summary
 plot(f.tfspawns.tvisits.pmdl) #plots the Markov chains
 ```
+
+## Does it matter who brings the female?
+
+### M1 Poisson
+
+```{r}
+fs.brought.by.nm.t <-
+  brm(data = behavior_sheet_cln, #Give the model the tibble
+      family = poisson(), #Tell model what type of distribution
+      total_female_spawning ~ female_visits_by_nm, #Specifying the model
+      iter = 2000, warmup = 1000, chains = 4, cores = 4, #Markov chain parameters
+      seed = 4, #Determines which random numbers
+      file = 'Exploratory model outputs/fs.brought.by.nm.t') #saves it as an output
+
+pp_check(fs.brought.by.nm.t)
+
+summary(fs.brought.by.nm.t)
+plot(fs.brought.by.nm.t)
+```
+
+### M2 Negative Binomial
+
+```{r}
+fs.brought.by.nm.nbt <-
+  brm(data = behavior_sheet_cln, #Give the model the tibble
+      family = negbinomial(), #Tell model what type of distribution
+      total_female_spawning ~ female_visits_by_nm, #Specifying the model
+      iter = 2000, warmup = 1000, chains = 4, cores = 4, #Markov chain parameters
+      seed = 4, #Determines which random numbers
+      file = 'Exploratory model outputs/fs.brought.by.nm.nbt') #saves it as an output
+
+pp_check(fs.brought.by.nm.nbt)
+
+summary(fs.brought.by.nm.nbt)
+plot(fs.brought.by.nm.nbt)
+```
+
+### M3 Zero inflated Poisson
+
+```{r}
+fs.brought.by.nm.zipt <-
+  brm(data = behavior_sheet_cln, #Give the model the tibble
+      family = zero_inflated_poisson(), #Tell model what type of distribution
+      total_female_spawning ~ female_visits_by_nm, #Specifying the model
+      iter = 2000, warmup = 1000, chains = 4, cores = 4, #Markov chain parameters
+      seed = 4, #Determines which random numbers
+      file = 'Exploratory model outputs/fs.brought.by.nm.zipt') #saves it as an output
+
+pp_check(fs.brought.by.nm.zipt)
+
+summary(fs.brought.by.nm.zipt)
+plot(fs.brought.by.nm.zipt)
+```
+
+### M4 Zero Inflated Negative Binomial
+
+```{r}
+fs.brought.by.nm.zinbt <-
+  brm(data = behavior_sheet_cln, #Give the model the tibble
+      family = zero_inflated_negbinomial(), #Tell model what type of distribution
+      total_female_spawning ~ female_visits_by_nm, #Specifying the model
+      iter = 2000, warmup = 1000, chains = 4, cores = 4, #Markov chain parameters
+      seed = 4, #Determines which random numbers
+      file = 'Exploratory model outputs/fs.brought.by.nm.zinbt') #saves it as an output
+
+pp_check(fs.brought.by.nm.zinbt)
+
+summary(fs.brought.by.nm.zinbt)
+plot(fs.brought.by.nm.zinbt)
+```
+
+### Test 'em
+
+```{r}
+loo(fs.brought.by.nm.t)
+loo(fs.brought.by.nm.nbt)
+loo(fs.brought.by.nm.zipt)
+loo(fs.brought.by.nm.zinbt)
+
+```
