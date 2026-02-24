@@ -155,20 +155,22 @@ behavedag2 <- dagitty('dag{
 "Satellite Presence" -> "Satellite Passes to Nesting Male to Nest"
 "Sneaker Brings to Nest" -> "Female Visits Nest"
 "Average Sneaker" [pos="0.124,0.588"]
-"Female Spawns" [outcome,pos="0.943,0.409"]
-"Female Visits Nest" [pos="0.734,0.415"]
-"NM and SAT positive interactions" [pos="0.720,0.615"]
-"NM and SNK interactions" [pos="0.377,0.765"]
-"Nesting Male Brings to Nest" [exposure,pos="0.371,0.255"]
-"Nesting Male Courtship" [pos="0.358,0.083"]
-"Other Females" [pos="0.376,0.431"]
-"Satellite Brings to Nest" [exposure,pos="0.370,0.552"]
-"Satellite Passes to Nesting Male to Nest" [exposure,pos="0.376,0.345"]
-"Satellite Presence" [pos="0.149,0.373"]
-"Sneaker Brings to Nest" [exposure,pos="0.371,0.644"]
+"Female Spawns" [outcome,pos="0.752,0.51705"]
+"Female Visits Nest" [pos="0.564,0.51705"]
+"NM and SAT positive interactions" [pos="0.564,0.3885"]
+"NM and SNK interactions" [pos="0.376,0.765"]
+"Nesting Male Brings to Nest" [exposure,pos="0.376,0.712"]
+"Nesting Male Courtship" [pos="0.376,0.659"]
+"Other Females" [pos="0.376,0.51705"]
+"Satellite Brings to Nest" [exposure,pos="0.376,0.330"]
+"Satellite Passes to Nesting Male to Nest" [exposure,pos="0.376,0.447"]
+"Satellite Presence" [pos="0.124,0.447"]
+"Sneaker Brings to Nest" [exposure,pos="0.376,0.588"]
 }')
 
-dag_plot2 <- ggdag(behavedag2, layout = 'nicely', node_size = 20, text_size = 2.5, label_size = 3, text_col = 'red') +
+behavedag2tidy <- tidy_dagitty(behavedag2)
+
+dag_plot2 <- ggdag(behavedag2tidy, node_size = 12, text_size = .75, label_size = 1) +
   theme_dag()
 dag_plot2
 ```
