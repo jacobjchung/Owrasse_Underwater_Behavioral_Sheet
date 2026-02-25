@@ -927,12 +927,17 @@ For SAT to F
 
 total_female_spawning \~ female_visit_by_sat + female_spawning_sat_passed_to_nm_but_sat_only_spawn + females_spawing_sat_brought_sat_only_spawn + sat_aggression_to_female_towards_nest
 
-normalize the pathways (fraction of visits are each pathways) before putting them in the model
+#### After meeting with Malin
 
-binomial with the N being the number of female visits
+The multiple regression model(s) should be a binomial with the N being the number of female visits, and p being the probability of spawning given a visit. We should normalize the pathways (variables) before putting them in the model, meaning take each variable as a fraction of visits for each pathways, i.e. fraction of females that spawned which were brought by the SAT, fraction of females that spawned which were brought by the SAT and passed to the NM.
 
-```{r}
-bf(spawns|trails(visits) ~ 1 + )
+To-Dos:
 
-number of sneakers as a quadratic 
+Look at the data distribution for the effect of sneakers on female visits and female spawning. Biologically, quadratic makes sense (low sneakers = low nest success = female doesn't visit/spawn, medium sneakers = moderate nest success = female likely visits/spawns, high sneakers = high nest success = females don't spawn due to high sneaker numbers.
+
+Normalize the variables that we think are important, "female_visits_by_nm, female_visit_by_sat, female_visits_by_sat_passed_to_nm" by the total number of visits
+
+```{r eval = FALSE}
+#bf(spawns|trails(visits) ~ 1 + )
+
 ```
