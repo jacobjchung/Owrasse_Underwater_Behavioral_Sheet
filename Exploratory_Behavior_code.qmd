@@ -834,3 +834,105 @@ fv.brought.by.snkr <-
 summary(fv.brought.by.snkr)
 plot(fv.brought.by.snkr)
 ```
+
+### Building/looking at our 'final' model.
+
+Overarching question: How does the social environment influence female mate choice?
+
+target outcome: How many females decided to spawn
+
+Thus total_female_spawning is the our response variable, because it tells us how many females made the choice to spawn.
+
+Based on our current understanding (and data), what has *direct* effects on this response?
+
+1.  Average number of sneaker
+2.  Social interactions at the nest
+    1.  NM to SAT
+    2.  NM to SNK
+    3.  SAT to SNK
+    4.  NM to F
+    5.  SAT to F
+
+How are these factors mentioned in our data.
+
+1.  average_snk
+2.  Social interactions at the nest
+    1.  female_visits_by_sat_passed_to_nm, female_spawning_sat_passed_to_nm, female_spawning_sat, nm_aggression_to_sat, sat_submission_to_nm
+    2.  nm_aggression_to_snk, snk_submission_to_nm
+    3.  sat_aggression_to_snk, snk_submission_to_sat
+    4.  female_visits_by_nm, female_spawning_with_nm_brought_by_nm, nm_aggression_to_female_towards_nest, nm_aggression_to_female_away_from_nest
+    5.  female_visit_by_sat, female_spawning_sat_passed_to_nm_but_sat_only_spawn, females_spawing_sat_brought_sat_only_spawn, sat_aggression_to_female_towards_nest
+
+**Note:** It is likely that nm_aggression_to_snk, snk_submission_to_nm, sat_aggression_to_snk, snk_submission_to_sat would be statistically the same as average_snk as each one of those are a related to how many sneakers are present.
+
+### Linear regression models
+
+total_female_spawning \~ average_snk
+
+total_female_spawning \~ female_visits_by_sat_passed_to_nm
+
+total_female_spawning \~ female_spawning_sat_passed_to_nm
+
+total_female_spawning \~ female_spawning_sat
+
+total_female_spawning \~ nm_aggression_to_sat
+
+total_female_spawning \~ sat_submission_to_nm
+
+total_female_spawning \~ nm_aggression_to_snk
+
+total_female_spawning \~ snk_submission_to_nm
+
+total_female_spawning \~ sat_aggression_to_snk
+
+total_female_spawning \~ snk_submission_to_sat
+
+total_female_spawning \~ female_visits_by_nm
+
+total_female_spawning \~ female_spawning_with_nm_brought_by_nm
+
+total_female_spawning \~ nm_aggression_to_female_towards_nest
+
+total_female_spawning \~ nm_aggression_to_female_away_from_nest
+
+total_female_spawning \~ female_visit_by_sat
+
+total_female_spawning \~ female_spawning_sat_passed_to_nm_but_sat_only_spawn
+
+total_female_spawning \~ females_spawing_sat_brought_sat_only_spawn
+
+total_female_spawning \~ sat_aggression_to_female_towards_nest
+
+However, these models are unrealistic, since it is highly unlikely that each one of these factors influence female spawning decision alone. Thus it is important for us to
+
+### Multiple Regression models
+
+ggcore? to look at how variables covary?
+
+For sneaker related models
+
+total_female_spawning \~ nm_aggression_to_snk + snk_submission_to_nm + sat_aggression_to_snk + snk_submission_to_sat
+
+Note: The associated aggression and submission variables (nm and sat respectively) are likely to be redundant since submission is a response to aggression, thus it is likely that both might not be needed. We will run both models to check.
+
+For Nesting Male/SAT related models
+
+total_female_spawning \~ female_visits_by_sat_passed_to_nm + female_spawning_sat_passed_to_nm + female_spawning_sat +nm_aggression_to_sat + total_female_spawning \~ sat_submission_to_nm
+
+For NM to F
+
+total_female_spawning \~ female_visits_by_nm + female_spawning_with_nm_brought_by_nm + nm_aggression_to_female_towards_nest + nm_aggression_to_female_away_from_nest
+
+For SAT to F
+
+total_female_spawning \~ female_visit_by_sat + female_spawning_sat_passed_to_nm_but_sat_only_spawn + females_spawing_sat_brought_sat_only_spawn + sat_aggression_to_female_towards_nest
+
+normalize the pathways (fraction of visits are each pathways) before putting them in the model
+
+binomial with the N being the number of female visits
+
+```{r}
+bf(spawns|trails(visits) ~ 1 + )
+
+number of sneakers as a quadratic 
+```
