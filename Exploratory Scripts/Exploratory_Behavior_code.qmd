@@ -730,7 +730,13 @@ Female prefer to not spawn with sneakers, thus higher Satellite and Nesting male
 ##### Female visits as a function of Nesting and Satellite male interactions against sneakers
 
 ```{r}
+snkint <- behavior_sheet_cln |>
+  mutate('snk.int' = (nm_aggression_to_snk + sat_aggression_to_snk + snk_submission_to_nm + snk_submission_to_sat)) |>
+  ggplot(aes(snk.int, total_female_visits)) +
+  geom_point() + 
+  geom_smooth()
 
+snkint
 ```
 
 ##### Female spawns as a function of Nesting and Satellite male interactions against sneakers
@@ -935,7 +941,7 @@ To-Dos:
 
 Look at the data distribution for the effect of sneakers on female visits and female spawning. Biologically, quadratic makes sense (low sneakers = low nest success = female doesn't visit/spawn, medium sneakers = moderate nest success = female likely visits/spawns, high sneakers = high nest success = females don't spawn due to high sneaker numbers) but data might show otherwise.
 
-Normalize the variables that we think are important, "female_visits_by_nm, female_visit_by_sat, female_visits_by_sat_passed_to_nm" by the total number of visits
+Normalize the variables that we think are important, "female_spawns_by_nm, female_spawns_by_sat, female_spawns_by_sat_passed_to_nm" by the total number of visits
 
 ```{r eval = FALSE}
 #bf(spawns|trails(visits) ~ 1 + )

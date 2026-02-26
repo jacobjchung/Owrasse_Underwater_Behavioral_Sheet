@@ -17,6 +17,10 @@ Do interactions with certain male reproductive tactics increase a female's prope
 
 What is the relationship between number of sneakers at a nest and the propensity for a female to spawn at that nest?
 
+1\.
+
+2\.
+
 # Tidying code 
 
 ```{r}
@@ -30,6 +34,8 @@ What is the relationship between number of sneakers at a nest and the propensity
 #install.packages('janitor')
 #install.packages('readxl')
 #install.packages('brms')
+#install.packages('ProbBayes')
+library(ProbBayes)
 library(ggeffects)
 library(tidyverse)
 library(janitor)
@@ -194,13 +200,13 @@ mean.var.table
 
 ```
 
-#### Female visits as a function of Average Number of Sneakers
+#### (Josh)Female visits as a function of Average Number of Sneakers
 
 ```{r}
 
 ```
 
-#### Female spawns as a function of Average number of sneakers
+#### (Josh)Female spawns as a function of Average number of sneakers
 
 ```{r}
 
@@ -216,8 +222,45 @@ While our data is based on counts, usually making model distributions poisson or
 
 By normalizing our pathways to the total number of visits, we are making each variable as a fraction of visits for each pathways, i.e. fraction of females that spawned which were brought by the SAT, fraction of females that spawned which were brought by the SAT and passed to the NM. This allows us to understand the probability of a certain pathway leading to spawning success.
 
+```{r}
+sheet.normalized <- behavior_sheet_cln |>
+  #Normalize the different pathways by the total number of females that spawned
+  mutate(
+    #Nesting male brings pathway
+    'fspawn.nm.b' = ((female_spawning_with_nm_brought_by_nm + female_spawning_with_only_sat_brought_by_nm)/total_female_spawning),
+    #Satellite male brings pathway
+    'fspawn.sat.b' = ((female_spawning_sat_brought + females_spawing_sat_brought_sat_only_spawn)/total_female_spawning),
+    #Satellite male passes to Nesting Male pathway
+    'fspawn.sat.b.p.nm' = ((female_spawning_sat_passed_to_nm + female_spawning_sat_passed_to_nm_but_only_sat_spawn)/total_female_spawning)
+  )
+  
+```
+
 #### Model
 
-```{r}
+##### Prior simulations
 
+```{r}
+sheet.n.priors <- sheet.normalized |>
+  mutate('nm.prior' = (sum(fspawn.nm.b, na.rm = T)/length(fspawn.nm.b)), 'sat.prior' = (sum(fspawn.sat.b, na.rm = T)/length(fspawn.sat.b)), 'sat.nm.prior' = (mean(fspawn.sat.b.p.nm, na.rm = T)/length(fspawn.sat.b.p.nm))) |>
+  dplyr::select((c(`nm.prior`, `sat.prior`, `sat.nm.prior`)))
+
+
+beta.select(quantile1 = list(x = 0.713, p = 0.5),
+            quantile2 = (x =  , p = 0.5))
+
+```
+
+```{r}
+fem.spawns.path.mdl <- sheet.normalized |>
+  brm(data = sheet.normalized,
+    family = binomial(link = 'logit'), #Tell model what type of distribution
+    #Specifying the model
+    total_female_spawning|trials(total_female_visits) ~ 1 + fspawn.nm.b + fspawn.sat.b,
+    iter = 2000, warmup = 1000, chains = 4, cores = 4, #Markov chain parameters
+      seed = 4, #Determines which random numbers
+      file = 'Data Analysis Outputs/fem.spawns.path.mdl') #saves it as an output
+pp_check(fem.spawns.path.mdl)
+print(fem.spawns.path.mdl, digits = 4)
+plot(fem.spawns.path.mdl)
 ```
