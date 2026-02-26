@@ -1,0 +1,101 @@
+---
+title: "Data_Analysis_Code"
+subtitle: Analysis Code and Narrative Descriptions
+format: pdf
+editor: visual
+---
+
+# Goals
+
+## Broad question
+
+What social factors are important in female mate choice?
+
+## Specific question(s)
+
+Do interactions with certain male reproductive tactics increase a female's propensity to spawn at a nest?
+
+What is the relationship between number of sneakers at a nest and the propensity for a female to spawn at that nest?
+
+# Tidying code 
+
+```{r}
+#Install and library important packages
+#install.packages('ggplot2')
+#install.packages('ggeffects')
+#install.packages('RColorBrewer')
+#install.packages('here')
+#install.packages('MASS')
+#install.packages('tidyverse')
+#install.packages('janitor')
+#install.packages('readxl')
+#install.packages('brms')
+library(ggeffects)
+library(tidyverse)
+library(janitor)
+library(here)
+library(ggplot2)
+library(readxl)
+library(dplyr)
+library(brms)
+library(RColorBrewer)
+library(tibble)
+library(MASS)
+
+behavior_sheet <- read_excel("UW_Nest_Behavioral_Sheets_Cleaned.xlsx")
+
+behavior_sheet_date <- as.Date(behavior_sheet$Date)
+behavior_sheet$Date <- behavior_sheet_date
+behavior_sheet_sep <- behavior_sheet %>%
+  mutate(Year = year(Date)) %>%
+  mutate(Month = month(Date)) %>%
+  mutate(Day = day(Date)) %>%
+  relocate(Year, .after = Date) %>%
+  relocate(Month, .after = Year) %>%
+  relocate(Day, .after = Month)
+head(behavior_sheet_sep)
+
+#Fix SAT submission to NM from chr to num
+sat_sub <- as.numeric(behavior_sheet_sep$`SAT submission to NM`) #Creates a vector with the same entries but as numbers
+behavior_sheet_sep$`SAT submission to NM` <- sat_sub #put it back into the tibble
+#Do the same for SNK Submission to SAT
+snk_sub <- as.numeric(behavior_sheet_sep$`SNK submission to SAT`)
+behavior_sheet_sep$`SNK submission to SAT` <- snk_sub
+#Same for NM aggression to SAT
+NM_aggsat <- as.numeric(behavior_sheet_sep$`NM aggression to SAT`)
+behavior_sheet_sep$`NM aggression to SAT` <- NM_aggsat
+
+behavior_sheet_cln <- behavior_sheet_sep |>
+  #Uses the Janitor package to standardize the names
+  clean_names()
+
+#Turn the year variable into a character for ease of comparison later on
+year_date <- as.character(behavior_sheet_cln$year) #Creates a vector with years as chr
+behavior_sheet_cln$year <- year_date #creates a new variable for ease of graphing later on
+```
+
+# Visualization
+
+## Female Spawns as a function of Female Visits
+
+This is just to help us visualize what sort of processes are occurring at the nest.
+
+```{r}
+fem.ts.fem.v <- behavior_sheet_cln |>
+  ggplot(aes(total_female_spawning, total_female_visits)) +
+  geom_point() +
+  theme_classic() +
+  labs(x = 'Female Visits (count)', y = 'Females that spawned (count)', title = "How many females spawned as a function of total Female Visits") +
+  theme(plot.title = element_text(hjust = 0.5)) #Moves title to the middle
+```
+
+## Female Visits/Spawns as a function of Average Number of Sneakers
+
+### Total Female visits as a function of Average Number of sneakers
+
+```{r}
+
+```
+
+### Total Females spawned as a function of Average Number of sneakers
+
