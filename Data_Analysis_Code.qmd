@@ -227,11 +227,11 @@ sheet.normalized <- behavior_sheet_cln |>
   #Normalize the different pathways by the total number of females that spawned
   mutate(
     #Nesting male brings pathway
-    'fspawn.nm.b' = ((female_spawning_with_nm_brought_by_nm + female_spawning_with_only_sat_brought_by_nm)/total_female_spawning),
+    'fspawn.nm.b' = ((female_spawning_with_nm_brought_by_nm + female_spawning_with_only_sat_brought_by_nm)/total_female_visits),
     #Satellite male brings pathway
-    'fspawn.sat.b' = ((female_spawning_sat_brought + females_spawing_sat_brought_sat_only_spawn)/total_female_spawning),
+    'fspawn.sat.b' = ((female_spawning_sat_brought + females_spawing_sat_brought_sat_only_spawn)/total_female_visits),
     #Satellite male passes to Nesting Male pathway
-    'fspawn.sat.b.p.nm' = ((female_spawning_sat_passed_to_nm + female_spawning_sat_passed_to_nm_but_only_sat_spawn)/total_female_spawning)
+    'fspawn.sat.b.p.nm' = ((female_spawning_sat_passed_to_nm + female_spawning_sat_passed_to_nm_but_only_sat_spawn)/total_female_visits)
   )
   
 ```
@@ -244,7 +244,85 @@ sheet.normalized.rmv <- sheet.normalized |>
   filter(!(total_female_spawning > total_female_visits))
 
 
-fem.spawns.path.mdl <- sheet.normalized.rmv |>
+fem.spawns.path.mdl.1 <- sheet.normalized.rmv |>
+  brm(data = sheet.normalized.rmv,
+    family = binomial(link = 'logit'), #Tell model what type of distribution
+    #Specifying the model
+    formula = bf(total_female_spawning | trials(total_female_visits) ~ 1 + fspawn.nm.b),
+    prior = c(prior(normal(0, 2), class = Intercept)),
+    iter = 2000, warmup = 1000, chains = 4, cores = 4, #Markov chain parameters
+      seed = 4, #Determines which random numbers
+      file = 'Data Analysis Outputs/fem.spawns.path.mdl.1') #saves it as an output
+
+#Gives a plot of the model's predictions
+pp_check(fem.spawns.path.mdl.1)
+#Gives us the summary of the model
+print(fem.spawns.path.mdl.1, digits = 4)
+#Plots the Markov chains
+plot(fem.spawns.path.mdl.1)
+```
+
+#### Model 2 Just Satellite
+
+```{r}
+sheet.normalized.rmv <- sheet.normalized |>
+  #Removing rows where there were data mistakes
+  filter(!(total_female_spawning > total_female_visits))
+
+
+fem.spawns.path.mdl.2 <- sheet.normalized.rmv |>
+  brm(data = sheet.normalized.rmv,
+    family = binomial(link = 'logit'), #Tell model what type of distribution
+    #Specifying the model
+    formula = bf(total_female_spawning | trials(total_female_visits) ~ 1 + fspawn.sat.b),
+    prior = c(prior(normal(0, 2), class = Intercept)),
+    iter = 2000, warmup = 1000, chains = 4, cores = 4, #Markov chain parameters
+      seed = 4, #Determines which random numbers
+      file = 'Data Analysis Outputs/fem.spawns.path.mdl.2') #saves it as an output
+
+#Gives a plot of the model's predictions
+pp_check(fem.spawns.path.mdl.2)
+#Gives us the summary of the model
+print(fem.spawns.path.mdl.2, digits = 4)
+#Plots the Markov chains
+plot(fem.spawns.path.mdl.2)
+```
+
+#### Model 3 Just Satellite pass to Nesting Male
+
+```{r}
+sheet.normalized.rmv <- sheet.normalized |>
+  #Removing rows where there were data mistakes
+  filter(!(total_female_spawning > total_female_visits))
+
+
+fem.spawns.path.mdl.3 <- sheet.normalized.rmv |>
+  brm(data = sheet.normalized.rmv,
+    family = binomial(link = 'logit'), #Tell model what type of distribution
+    #Specifying the model
+    formula = bf(total_female_spawning | trials(total_female_visits) ~ 1 + fspawn.sat.b.p.nm),
+    prior = c(prior(normal(0, 2), class = Intercept)),
+    iter = 2000, warmup = 1000, chains = 4, cores = 4, #Markov chain parameters
+      seed = 4, #Determines which random numbers
+      file = 'Data Analysis Outputs/fem.spawns.path.mdl.3') #saves it as an output
+
+#Gives a plot of the model's predictions
+pp_check(fem.spawns.path.mdl.3)
+#Gives us the summary of the model
+print(fem.spawns.path.mdl.3, digits = 4)
+#Plots the Markov chains
+plot(fem.spawns.path.mdl.3)
+```
+
+#### Model 4, Just Nesting Male and Just Satellite
+
+```{r}
+sheet.normalized.rmv <- sheet.normalized |>
+  #Removing rows where there were data mistakes
+  filter(!(total_female_spawning > total_female_visits))
+
+
+fem.spawns.path.mdl.4 <- sheet.normalized.rmv |>
   brm(data = sheet.normalized.rmv,
     family = binomial(link = 'logit'), #Tell model what type of distribution
     #Specifying the model
@@ -252,19 +330,77 @@ fem.spawns.path.mdl <- sheet.normalized.rmv |>
     prior = c(prior(normal(0, 2), class = Intercept)),
     iter = 2000, warmup = 1000, chains = 4, cores = 4, #Markov chain parameters
       seed = 4, #Determines which random numbers
-      file = 'Data Analysis Outputs/fem.spawns.path.mdl') #saves it as an output
+      file = 'Data Analysis Outputs/fem.spawns.path.mdl.4') #saves it as an output
 
-pp_check(fem.spawns.path.mdl)
-print(fem.spawns.path.mdl, digits = 4)
-plot(fem.spawns.path.mdl)
+#Gives a plot of the model's predictions
+pp_check(fem.spawns.path.mdl.4)
+#Gives us the summary of the model
+print(fem.spawns.path.mdl.4, digits = 4)
+#Plots the Markov chains
+plot(fem.spawns.path.mdl.4)
 ```
-
-#### Model 2 Just Satellite
-
-#### Model 3 Just Satellite pass to Nesting Male
-
-#### Model 4, Just Nesting Male and Just Satellite
 
 #### Model 5, Just Nesting Male and Just Satellite pass to Nesting Male
 
+```{r}
+sheet.normalized.rmv <- sheet.normalized |>
+  #Removing rows where there were data mistakes
+  filter(!(total_female_spawning > total_female_visits))
+
+
+fem.spawns.path.mdl.5 <- sheet.normalized.rmv |>
+  brm(data = sheet.normalized.rmv,
+    family = binomial(link = 'logit'), #Tell model what type of distribution
+    #Specifying the model
+    formula = bf(total_female_spawning | trials(total_female_visits) ~ 1 + fspawn.nm.b + fspawn.sat.b.p.nm),
+    prior = c(prior(normal(0, 2), class = Intercept)),
+    iter = 2000, warmup = 1000, chains = 4, cores = 4, #Markov chain parameters
+      seed = 4, #Determines which random numbers
+      file = 'Data Analysis Outputs/fem.spawns.path.mdl.5') #saves it as an output
+
+#Gives a plot of the model's predictions
+pp_check(fem.spawns.path.mdl.5)
+#Gives us the summary of the model
+print(fem.spawns.path.mdl.5, digits = 4)
+#Plots the Markov chains
+plot(fem.spawns.path.mdl.5)
+```
+
 #### Model 6, Just Satellite and Just Satellite pass to Nesting Male
+
+```{r}
+sheet.normalized.rmv <- sheet.normalized |>
+  #Removing rows where there were data mistakes
+  filter(!(total_female_spawning > total_female_visits))
+
+
+fem.spawns.path.mdl.6 <- sheet.normalized.rmv |>
+  brm(data = sheet.normalized.rmv,
+    family = binomial(link = 'logit'), #Tell model what type of distribution
+    #Specifying the model
+    formula = bf(total_female_spawning | trials(total_female_visits) ~ 1 + fspawn.sat.b + fspawn.sat.b.p.nm),
+    prior = c(prior(normal(0, 2), class = Intercept)),
+    iter = 2000, warmup = 1000, chains = 4, cores = 4, #Markov chain parameters
+      seed = 4, #Determines which random numbers
+      file = 'Data Analysis Outputs/fem.spawns.path.mdl.6') #saves it as an output
+
+#Gives a plot of the model's predictions
+pp_check(fem.spawns.path.mdl.6)
+#Gives us the summary of the model
+print(fem.spawns.path.mdl.6, digits = 4)
+#Plots the Markov chains
+plot(fem.spawns.path.mdl.6)
+```
+
+#### Compare the models
+
+```{r}
+waic(fem.spawns.path.mdl.1)
+waic(fem.spawns.path.mdl.2)
+waic(fem.spawns.path.mdl.3)
+waic(fem.spawns.path.mdl.4)
+waic(fem.spawns.path.mdl.5)
+waic(fem.spawns.path.mdl.6)
+```
+
+Based on the waic values, model 5 which is our model with the Nesting male bringing females and Satellite passing to Nesting male pathways is the best model given our data. This makes biological sense, the better a Nesting male and Satellite pair are the more likely a nest is going to be efficient, chasing sneakers and bringing females!
