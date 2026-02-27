@@ -21,7 +21,7 @@ What is the relationship between number of sneakers at a nest and the propensity
 
 2\.
 
-# Tidying code 
+# Tidying code
 
 ```{r}
 #Install and library important packages
@@ -107,7 +107,7 @@ fem.ts.fem.v
 fem.v.avg.snk <- behavior_sheet_cln |>
   ggplot(aes(average_snk, total_female_visits)) + #gives ggplot dimensions
   geom_point() + #makes the plot a scatterplot 
-  geom_smooth(se = F) + #Adds a trendline for better visuals
+  geom_smooth(se = F, color = 'darkgreen') + #Adds a trendline for better visuals
   theme_classic() + #Sets the plot visuals
   labs(x = 'Average Number of Sneakers (count)', y = 'Females that visited (count)', title = "How many females visited the nest as a function of Average Number of Sneakers") + #Sets the axis and title labels
   theme(plot.title = element_text(hjust = 0.5)) #Moves title to the middle
@@ -122,7 +122,7 @@ fem.v.avg.snk
 fem.s.avg.snk <- behavior_sheet_cln |>
   ggplot(aes(average_snk, total_female_spawning)) + #gives ggplot dimensions
   geom_point() + #makes the plot a scatterplot 
-  geom_smooth(se = F) + #Adds a trendline for better visuals
+  geom_smooth(se = F, color = 'darkgreen') + #Adds a trendline for better visuals
   theme_classic() + #Sets the plot visuals
   labs(x = 'Average Number of Sneakers (count)', y = 'Females that spawned (count)', title = "How many females spawned at the nest as a function of Average Number of Sneakers") + #Sets the axis and title labels
   theme(plot.title = element_text(hjust = 0.5)) #Moves title to the middle
@@ -137,7 +137,7 @@ fem.s.bnm <- behavior_sheet_cln |>
   mutate('nm.brought.spawns'= (female_spawning_with_nm_brought_by_nm + female_spawning_with_only_sat_brought_by_nm)) |>
   ggplot(aes(nm.brought.spawns, total_female_spawning)) + #gives ggplot dimensions
   geom_point() + #makes the plot a scatterplot 
-  geom_smooth( se = F) + #Adds a trendline for better visuals
+  geom_smooth(method = 'glm.nb', se = F, color = 'darkgreen') + #Plots a Negative Binomial model onto the data
   theme_classic() + #Sets the plot visuals
   labs(x = 'Spawns when brought by the Nesting Male (count)', y = 'Females that spawned (count)', title = "How many females spawned as a function of being brought by the Nesting Male") + #Sets the axis and title labels
   theme(plot.title = element_text(hjust = 0.5)) #Moves title to the middle
@@ -152,7 +152,7 @@ fem.s.bsat <- behavior_sheet_cln |>
   mutate('sat.brought.spawns'= (female_spawning_sat_brought + females_spawing_sat_brought_sat_only_spawn)) |>
   ggplot(aes(sat.brought.spawns, total_female_spawning)) + #gives ggplot dimensions
   geom_point() + #makes the plot a scatterplot 
-  geom_smooth(method = 'glm.nb', se = F) + #Plots a Negative Binomial model onto the data
+  geom_smooth(method = 'glm.nb', se = F, color = 'darkgreen') + #Plots a Negative Binomial model onto the data
   theme_classic() + #Sets the plot visuals
   labs(x = 'Spawns when brought by the Satellite Male (count)', y = 'Females that spawned (count)', title = "How many females spawned as a function of being brought by the Satellite Male") + #Sets the axis and title labels
   theme(plot.title = element_text(hjust = 0.5)) #Moves title to the middle
@@ -167,7 +167,7 @@ fem.s.bsat.pnm <- behavior_sheet_cln |>
   mutate('bsat.pnm.spawns'= (female_spawning_sat_passed_to_nm + female_spawning_sat_passed_to_nm_but_only_sat_spawn)) |>
   ggplot(aes(bsat.pnm.spawns, total_female_spawning)) + #gives ggplot dimensions
   geom_point() + #makes the plot a scatterplot 
- geom_smooth(method = 'glm.nb', se = F) + #Plots a Negative Binomial model onto the data
+ geom_smooth(method = 'glm.nb', se = F, color = 'darkgreen') + #Plots a Negative Binomial model onto the data
   theme_classic() + #Sets the plot visuals
   labs(x = 'Spawns when brought by the Satellite Male but passed (count)', y = 'Females that spawned (count)', title = "How many females spawned as a function of being brought by the Satellite Male but passed off") + #Sets the axis and title labels
   theme(plot.title = element_text(hjust = 0.5)) #Moves title to the middle
