@@ -252,14 +252,15 @@ beta.select(quantile1 = list(x = 0.713, p = 0.5),
 ```
 
 ```{r}
-fem.spawns.path.mdl <- sheet.normalized |>
+fem.spawns.path.mdl.test <- sheet.normalized |>
   brm(data = sheet.normalized,
     family = binomial(link = 'logit'), #Tell model what type of distribution
     #Specifying the model
-    total_female_spawning|trials(total_female_visits) ~ 1 + fspawn.nm.b + fspawn.sat.b,
+    formula = bf(total_female_spawning | trials(total_female_visits) ~ 1 + fspawn.nm.b),
+    prior = c(prior(normal(0, 2), class = Intercept)),
     iter = 2000, warmup = 1000, chains = 4, cores = 4, #Markov chain parameters
       seed = 4, #Determines which random numbers
-      file = 'Data Analysis Outputs/fem.spawns.path.mdl') #saves it as an output
+      file = 'Data Analysis Outputs/fem.spawns.path.mdl.test') #saves it as an output
 pp_check(fem.spawns.path.mdl)
 print(fem.spawns.path.mdl, digits = 4)
 plot(fem.spawns.path.mdl)
