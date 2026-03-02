@@ -947,3 +947,5 @@ Normalize the variables that we think are important, "female_spawns_by_nm, femal
 #bf(spawns|trails(visits) ~ 1 + )
 
 ```
+
+## More Intricate model testing
