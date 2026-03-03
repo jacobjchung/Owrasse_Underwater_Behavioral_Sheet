@@ -948,28 +948,54 @@ Normalize the variables that we think are important, "female_spawns_by_nm, femal
 
 ```
 
-## More Intricate model testing
+### Female visits/spawns as a function of Average Number of Sneakers
 
-We want to create a model that allows us to look at the differing 'pathways' in which the female can visit a nest.
+Based on our visualizations above, we can assume that a negative binomial distribution will be best for our data. This is because, while a Poisson distribution is based on counts, it has the assumption that the mean = variance. Based on our data, the variance is higher than the mean, thus a negative binomial is a better fit for our data.
 
-let's visualize this.
-
-```{r eval= F}
-
-pathways <- behavior_sheet_cln |>
+```{r}
+mean.var.table <- behavior_sheet_cln |>
   mutate(
-    'avg_nm_brings' = sum(female_visits_by_nm)/length(female_visits_by_nm),
-    'avg_sat_brings' = sum(female_visit_by_sat)/length(female_visit_by_sat),
-    'avg_sat_pass_nm_brings' = sum(female_visits_by_sat_passed_to_nm)/length(female_visits_by_sat_passed_to_nm),
-    'avg_snk_brings' = sum(female_visit_by_snk)/length(female_visit_by_snk)
-  ) |>
-  dplyr::select(avg_nm_brings:avg_snk_brings) |>
-  pivot_longer(cols = (avg_nm_brings:avg_snk_brings),
-               names_to = 'Type',
-               values_to = 'Count') |>
-  distinct() |>
-  ggplot(aes(x=Type, y = Count)) +
-  geom_column()
+    'average sneaker mean' = mean(behavior_sheet_cln$average_snk),
+    'average sneaker variation' = var(behavior_sheet_cln$average_snk), 
+    'female visits mean' = mean(behavior_sheet_cln$total_female_visits),
+    'female visits sd' = var(behavior_sheet_cln$total_female_visits),
+    'female spawns mean' = mean(behavior_sheet_cln$total_female_spawning),
+    'female spawns sd' = var(behavior_sheet_cln$total_female_spawning)) |>
+  dplyr::select(last_col(offset = 6-1):last_col()) |>
+  pivot_longer(cols = 1:6, names_to = 'Which Value', values_to = 'Number') |>
+  unique()
 
-pathways
+mean.var.table  
+
+```
+
+#### (Josh)Female visits as a function of Average Number of Sneakers
+
+```{r}
+fv.avgsnkr1 <-
+  brm(data = behavior_sheet_cln, #Give the model the tibble
+      family = poisson(link = "log"), #Tell model what type of distribution
+      total_female_visits ~ average_snk, #Specifying the model
+      iter = 2000, warmup = 1000, chains = 4, cores = 4, #Markov chain parameters
+      seed = 4, #Determines which random numbers
+      file = 'Data Analysis Outputs/fv.avgsnkr1') #saves it as an output
+
+summary(fv.avgsnkr1)
+plot(fv.avgsnkr1)
+```
+
+#### (Josh)Female spawns as a function of Average number of sneakers
+
+```{r}
+fs.avgsnkr <-
+  brm(data = behavior_sheet_cln, #Give the model the tibble
+      family = poisson(link="log"), #Tell model what type of distribution
+      total_spawns ~ average_snk, #Specifying the model
+      iter = 2000, warmup = 1000, chains = 4, cores = 4, #Markov chain parameters
+      seed = 4, #Determines which random numbers
+      file = 'Data Analysis Outputs/fs.avgsnkr') #saves it as an output
+
+summary(fs.avgsnkr)
+plot(fs.avgsnkr)
+
 ```

@@ -15,8 +15,6 @@ What social factors are important in female mate choice?
 
 Do interactions with certain male reproductive tactics increase a female's propensity to spawn at a nest?
 
-What is the relationship between number of sneakers at a nest and the propensity for a female to spawn at that nest?
-
 Does nesting male courtship behavior increase the propensity for a female to visit or spawn with that male?
 
 How does nesting male aggression influence female visits and spawning?
@@ -193,8 +191,6 @@ plot(fem.v.nmcourt)
 
 ```
 
-![](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACgAAAAaCAYAAADFTB7LAAAAcElEQVR4Xu3OwQmAQAxE0bClWYCW5N06tM6V2YPg5CjoF/JhLoHAi6iqn9eOefUbqrYvHY0cQDLyAlKRNyARmYA0ZMLRkAlGQyaU72tkAtlim7r/vJqDUDjlKBROOQyFU2icQuMUGqfQuBEaV1XPOwEx96nYACK8+wAAAABJRU5ErkJggg== "Run Current Chunk")
-
 ### Total Female Spawns as a function of Nesting Male Courtship
 
 ```{r}
@@ -252,61 +248,9 @@ f.spawns.nmagg
 
 ### Generalized Linear Models
 
-### Female visits/spawns as a function of Average Number of Sneakers
-
-Based on our visualizations above, we can assume that a negative binomial distribution will be best for our data. This is because, while a Poisson distribution is based on counts, it has the assumption that the mean = variance. Based on our data, the variance is higher than the mean, thus a negative binomial is a better fit for our data.
-
-```{r}
-mean.var.table <- behavior_sheet_cln |>
-  mutate(
-    'average sneaker mean' = mean(behavior_sheet_cln$average_snk),
-    'average sneaker variation' = var(behavior_sheet_cln$average_snk), 
-    'female visits mean' = mean(behavior_sheet_cln$total_female_visits),
-    'female visits sd' = var(behavior_sheet_cln$total_female_visits),
-    'female spawns mean' = mean(behavior_sheet_cln$total_female_spawning),
-    'female spawns sd' = var(behavior_sheet_cln$total_female_spawning)) |>
-  dplyr::select(last_col(offset = 6-1):last_col()) |>
-  pivot_longer(cols = 1:6, names_to = 'Which Value', values_to = 'Number') |>
-  unique()
-
-mean.var.table  
-
-```
-
-#### (Josh)Female visits as a function of Average Number of Sneakers
-
-```{r}
-fv.avgsnkr1 <-
-  brm(data = behavior_sheet_cln, #Give the model the tibble
-      family = poisson(link = "log"), #Tell model what type of distribution
-      total_female_visits ~ average_snk, #Specifying the model
-      iter = 2000, warmup = 1000, chains = 4, cores = 4, #Markov chain parameters
-      seed = 4, #Determines which random numbers
-      file = 'Exploratory model outputs/fv.avgsnkr1') #saves it as an output
-
-summary(fv.avgsnkr1)
-plot(fv.avgsnkr1)
-```
-
-#### (Josh)Female spawns as a function of Average number of sneakers
-
-```{r}
-fs.avgsnkr <-
-  brm(data = behavior_sheet_cln, #Give the model the tibble
-      family = poisson(link="log"), #Tell model what type of distribution
-      total_spawns ~ average_snk, #Specifying the model
-      iter = 2000, warmup = 1000, chains = 4, cores = 4, #Markov chain parameters
-      seed = 4, #Determines which random numbers
-      file = 'Exploratory model outputs/fs.avgsnkr') #saves it as an output
-
-summary(fs.avgsnkr)
-plot(fs.avgsnkr)
-
-```
-
 ### Female Visits/Spawns as a function of Nesting Male Courtship
 
-#### (Josh) Female visits as a function of nesting male courtship
+#### Female visits as a function of nesting male courtship
 
 ```{r}
 fv.nm.court <-
@@ -315,13 +259,13 @@ fv.nm.court <-
       total_female_visits ~ nm_courtship, #Specifying the model
       iter = 2000, warmup = 1000, chains = 4, cores = 4, #Markov chain parameters
       seed = 4, #Determines which random numbers
-      file = 'Exploratory model outputs/fv.nm.court') #saves it as an output
+      file = 'Data Analysis Outputs/fv.nm.court') #saves it as an output
 
 summary(fv.nm.court)
 plot(fv.nm.court)
 ```
 
-#### (Josh) Female spawning as a function of nesting male courtship
+#### Female spawning as a function of nesting male courtship
 
 ```{r}
 fs.nm.court <-
@@ -330,7 +274,7 @@ fs.nm.court <-
       total_female_spawning ~ nm_courtship, #Specifying the model
       iter = 2000, warmup = 1000, chains = 4, cores = 4, #Markov chain parameters
       seed = 4, #Determines which random numbers
-      file = 'Exploratory model outputs/fs.nm.court') #saves it as an output
+      file = 'Data Analysis Outputs/fs.nm.court') #saves it as an output
 
 summary(fs.nm.court)
 plot(fs.nm.court)
@@ -338,7 +282,7 @@ plot(fs.nm.court)
 
 ### Female visits/spawning as a function of nesting male aggression
 
-#### (Josh) Female visits as a function of nesting male aggression
+#### Female visits as a function of nesting male aggression
 
 ```{r}
 fvisits.nmagg <- behavior_sheet_cln |>
@@ -351,13 +295,13 @@ fvisits.nmagg.mdl1 <-
       total_female_visits ~ total_nm_agg, #Specifying the model
       iter = 2000, warmup = 1000, chains = 4, cores = 4, #Markov chain parameters
       seed = 4, #Determines which random numbers
-      file = 'Exploratory model outputs/fvisits.nmagg.mdl1') #saves it as an output
+      file = 'Data Analysis Outputs/fvisits.nmagg.mdl1') #saves it as an output
 
 print(fvisits.nmagg.mdl1, digits = 4)
 plot(fvisits.nmagg.mdl1)
 ```
 
-#### (Josh) Female spawning as a function of nesting male aggression
+#### Female spawning as a function of nesting male aggression
 
 ```{r}
 f.spawns.nmagg <- behavior_sheet_cln |>
@@ -370,7 +314,7 @@ f.spawns.nmagg.mdl1 <-
       total_spawns ~ total_nm_agg, #Specifying the model
       iter = 2000, warmup = 1000, chains = 4, cores = 4, #Markov chain parameters
       seed = 4, #Determines which random numbers
-      file = 'Exploratory model outputs/f.visits.nmagg.mdl1') #saves it as an output
+      file = 'Data Analysis Outputs/f.visits.nmagg.mdl1') #saves it as an output
 
 print(f.spawns.nmagg.mdl1, digits = 4) #Gives a summary of the model
 plot(f.spawns.nmagg.mdl1) #Plots the chains
