@@ -523,20 +523,25 @@ Goal: Given how a female visits, does it change the likelihood of spawning (in e
 Let's visualize the pathways.
 
 ```{r}
-pathways <- behavior_sheet_cln |>
+pathways.visits <- behavior_sheet_cln |>
+    #Remove nests where there are data inconsistencies
+  filter_out(female_visits_by_nm > total_female_visits) |>
+  filter_out(female_visit_by_sat > total_female_visits) |>
+  filter_out(female_visits_by_sat_passed_to_nm > total_female_visits)|>
+  filter_out(female_visit_by_snk > total_female_visits)|>
   #Create new variables that account for the pathway's proportion
   mutate(
-    'Nesting Male Path' = sum(female_visits_by_nm)/sum(total_female_visits),
-    'Satellite Male Path' = sum(female_visit_by_sat)/sum(total_female_visits),
-    'Satellite Pass Path' = sum(female_visits_by_sat_passed_to_nm)/sum(total_female_visits),
-    'Sneaker Male Path' = sum(female_visit_by_snk)/sum(total_female_visits)
+    'Nesting Male' = sum(female_visits_by_nm)/sum(total_female_visits),
+    'Satellite Male' = sum(female_visit_by_sat)/sum(total_female_visits),
+    'Satellite Male Passes' = sum(female_visits_by_sat_passed_to_nm)/sum(total_female_visits),
+    'Sneaker Male' = sum(female_visit_by_snk)/sum(total_female_visits)
   ) |>
   #Make the tibble only include these variables
-  dplyr::select(`Nesting Male Path`:`Sneaker Male Path`) |>
+  dplyr::select(`Nesting Male`:`Sneaker Male`) |>
   #Remove all the duplicates
   distinct() |>
   #Adjust the table to make the variables go into one coloumn
-  pivot_longer(`Nesting Male Path`:`Sneaker Male Path`,
+  pivot_longer(`Nesting Male`:`Sneaker Male`,
                names_to = 'Pathway',
                values_to = 'Proportion') |>
   #Graph it
@@ -545,12 +550,94 @@ pathways <- behavior_sheet_cln |>
   geom_col() +
   labs(x = 'Pathway', 
        y = 'Proportion of total Visits',
-       title = "The Propotion of each Visitation Pathway for Females",) + #edits axis and title labels
+       title = "The Propotion of each Visitation Pathway for Female Visits",) + #edits axis and title labels
   theme_classic() + #Sets the plot visuals
-  scale_fill_manual(values = c('Nesting Male Path' = '#065143', 'Satellite Male Path' = '#db5a42', 'Satellite Pass Path' = '#7A9B76','Sneaker Male Path' = '#1481BA')) +
+  #Adds a color scheme to the plot
+  scale_fill_manual(values = c('Nesting Male' = '#065143', 'Satellite Male' = '#db5a42', 'Satellite Male Passes' = '#7A9B76','Sneaker Male' = '#1481BA')) +
   theme(plot.title = element_text(hjust = 0.5)) + #Moves title to the middle
   theme(legend.position = "none") # Removes all legends
-
   
-pathways
+pathways.visits
+```
+
+Now let's plot the success rate of each pathway:
+
+```{r}
+pathways.success.rate <- behavior_sheet_cln |>
+  #Remove nests where there are data inconsistencies
+  filter_out((female_spawning_with_nm_brought_by_nm + female_spawning_with_only_sat_brought_by_nm)/(female_visits_by_nm) > 1) |>
+  filter_out((female_spawning_sat_brought + females_spawing_sat_brought_sat_only_spawn)/(female_visit_by_sat) > 1) |>
+  filter_out((female_spawning_sat_passed_to_nm + female_spawning_sat_passed_to_nm_but_only_sat_spawn)/(female_visits_by_sat_passed_to_nm) > 1) |>
+  filter_out((female_spawning_snk_brought + female_spawning_snk_brought_skn_only_spawn)/(female_visit_by_snk) > 1)|>
+  #Create new variables that account for the pathway's proportion
+  mutate(
+    'Nesting Male' = sum(female_spawning_with_nm_brought_by_nm + female_spawning_with_only_sat_brought_by_nm)/sum(female_visits_by_nm),
+    'Satellite Male' = sum(female_spawning_sat_brought + females_spawing_sat_brought_sat_only_spawn)/sum(female_visit_by_sat),
+    'Satellite Pass' = sum(female_spawning_sat_passed_to_nm + female_spawning_sat_passed_to_nm_but_only_sat_spawn)/sum(female_visits_by_sat_passed_to_nm),
+    'Sneaker Male' = sum(female_spawning_snk_brought + female_spawning_snk_brought_skn_only_spawn)/sum(female_visit_by_snk)
+  ) |>
+  #Make the tibble only include these variables
+  dplyr::select(`Nesting Male`:`Sneaker Male`) |>
+  #Remove all the duplicates
+  distinct() |>
+  #Adjust the table to make the variables go into one coloumn
+  pivot_longer(`Nesting Male`:`Sneaker Male`,
+               names_to = 'Pathway',
+               values_to = 'Success Rate') |>
+  #Graph it
+  ggplot(aes(Pathway, `Success Rate`, fill = Pathway)) +
+  #Makes the graph a bar graph
+  geom_col() +
+  labs(x = 'Pathway', 
+       y = 'Success rate',
+       title = "The Success Rate of each Visitation Pathway",) + #edits axis and title labels
+  theme_classic() + #Sets the plot visuals
+  #Adds a color scheme to the plot
+  scale_fill_manual(values = c('Nesting Male' = '#065143', 'Satellite Male' = '#db5a42', 'Satellite Pass' = '#7A9B76','Sneaker Male' = '#1481BA')) +
+  theme(plot.title = element_text(hjust = 0.5)) + #Moves title to the middle
+  theme(legend.position = "none") # Removes all legends
+  
+pathways.success.rate
+```
+
+The presence of the sneaker male rate could be because of secondary satellites being counted as sneakers
+
+Now let's visualize how often these pathway successes occur in total at a nest.
+
+```{r}
+pathways.success.rate.total <- behavior_sheet_cln |>
+  #Remove nests where there are data inconsistencies
+  filter_out((female_spawning_with_nm_brought_by_nm + female_spawning_with_only_sat_brought_by_nm)/(total_female_spawning)> 1 ) |>
+  filter_out((female_spawning_sat_brought + females_spawing_sat_brought_sat_only_spawn)/(total_female_spawning) > 1) |>
+  filter_out((female_spawning_sat_passed_to_nm + female_spawning_sat_passed_to_nm_but_only_sat_spawn)/(female_visits_by_sat_passed_to_nm) > 1) |>
+  filter_out((female_spawning_snk_brought + female_spawning_snk_brought_skn_only_spawn)/(total_female_spawning) > 1)|>
+  #Create new variables that account for the pathway's proportion
+  mutate(
+    'Nesting Male' = sum(female_spawning_with_nm_brought_by_nm + female_spawning_with_only_sat_brought_by_nm)/sum(total_female_spawning),
+    'Satellite Male' = sum(female_spawning_sat_brought + females_spawing_sat_brought_sat_only_spawn)/sum(total_female_spawning),
+    'Satellite Male Pass' = sum(female_spawning_sat_passed_to_nm + female_spawning_sat_passed_to_nm_but_only_sat_spawn)/sum(total_female_spawning),
+    'Sneaker Male' = sum(female_spawning_snk_brought + female_spawning_snk_brought_skn_only_spawn)/sum(total_female_spawning)
+  ) |>
+  #Make the tibble only include these variables
+  dplyr::select(`Nesting Male`:`Sneaker Male`) |>
+  #Remove all the duplicates
+  distinct() |>
+  #Adjust the table to make the variables go into one coloumn
+  pivot_longer(`Nesting Male`:`Sneaker Male`,
+               names_to = 'Pathway',
+               values_to = 'Success Rate') |>
+  #Graph it
+  ggplot(aes(Pathway, `Success Rate`, fill = Pathway)) +
+  #Makes the graph a bar graph
+  geom_col() +
+  labs(x = 'Pathway', 
+       y = 'Success rate',
+       title = "The Proportion of Total Females that spawned for each Visitation Pathway",) + #edits axis and title labels
+  theme_classic() + #Sets the plot visuals
+  #Adds a color scheme to the plot
+  scale_fill_manual(values = c('Nesting Male' = '#065143', 'Satellite Male' = '#db5a42', 'Satellite Male Pass' = '#7A9B76','Sneaker Male' = '#1481BA')) +
+  theme(plot.title = element_text(hjust = 0.5)) + #Moves title to the middle
+  theme(legend.position = "none") # Removes all legends
+  
+pathways.success.rate.total
 ```

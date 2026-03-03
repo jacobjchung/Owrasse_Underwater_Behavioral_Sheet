@@ -999,3 +999,45 @@ summary(fs.avgsnkr)
 plot(fs.avgsnkr)
 
 ```
+
+#### Varying Pathway's success rates
+
+###### This is scratch code for figuring out how to filter out inconsistent data 
+
+```{r}
+nm.brought.path <- behavior_sheet_cln |>
+  mutate(
+    'prob.of.spawn' = ((female_spawning_with_nm_brought_by_nm + female_spawning_with_only_sat_brought_by_nm)/female_visits_by_nm)
+  ) |>
+  filter_out(prob.of.spawn > 1) |>
+  ggplot(aes(female_visits_by_nm, prob.of.spawn)) +
+  geom_point(na.rm = T)
+
+nm.brought.path
+
+```
+
+```{r}
+sat.brought.path <- behavior_sheet_cln |>
+  mutate(
+    'prob.of.spawn' = ((female_spawning_sat_brought + females_spawing_sat_brought_sat_only_spawn)/female_visit_by_sat)
+  ) |>
+  filter_out(prob.of.spawn > 1) |>
+  ggplot(aes(female_visit_by_sat, prob.of.spawn)) +
+  geom_point(na.rm = T)
+
+sat.brought.path
+```
+
+```{r}
+sat.pass.brought.path <- behavior_sheet_cln |>
+  mutate(
+    'prob.of.spawn' = (female_spawning_sat_passed_to_nm + female_spawning_sat_passed_to_nm_but_only_sat_spawn)/(female_visits_by_sat_passed_to_nm)
+  ) |>
+  filter_out(prob.of.spawn > 1) |>
+  ggplot(aes(female_visits_by_sat_passed_to_nm, prob.of.spawn)) +
+  geom_point(na.rm = T)
+
+sat.pass.brought.path
+
+```
