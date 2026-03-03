@@ -17,9 +17,9 @@ Do interactions with certain male reproductive tactics increase a female's prope
 
 What is the relationship between number of sneakers at a nest and the propensity for a female to spawn at that nest?
 
-1\.
+Does nesting male courtship behavior increase the propensity for a female to visit or spawn with that male?
 
-2\.
+How does nesting male aggression influence female visits and spawning?
 
 # Tidying code
 
@@ -177,6 +177,77 @@ fem.s.bsat.pnm <- behavior_sheet_cln |>
 fem.s.bsat.pnm
 ```
 
+## Female Visits/Spawns as a function of Nesting Male Courtship
+
+### Total Female Visits as a function of Nesting Male Courtship
+
+```{r}
+fem.v.nmcourt <- behavior_sheet_cln |>
+  ggplot(aes(nm_courtship, total_female_visits, color = average_snk)) + #gives plot dimensions
+  geom_point() + #scatterplot
+  geom_smooth(method ='glm.nb', se = F, color = 'darkgreen') + #Plots a Negative Binomial model onto the data
+  theme_classic()+
+  labs(x = 'How many times nesting male displayed courtship behavior (count)', y = 'Females that visited (count)', title = 'How many females visited as a function of nesting male courtship events') #Sets axis and title
+
+plot(fem.v.nmcourt)
+
+```
+
+![](data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACgAAAAaCAYAAADFTB7LAAAAcElEQVR4Xu3OwQmAQAxE0bClWYCW5N06tM6V2YPg5CjoF/JhLoHAi6iqn9eOefUbqrYvHY0cQDLyAlKRNyARmYA0ZMLRkAlGQyaU72tkAtlim7r/vJqDUDjlKBROOQyFU2icQuMUGqfQuBEaV1XPOwEx96nYACK8+wAAAABJRU5ErkJggg== "Run Current Chunk")
+
+### Total Female Spawns as a function of Nesting Male Courtship
+
+```{r}
+fem.s.nmcourt <- behavior_sheet_cln |>
+  ggplot(aes(nm_courtship, total_female_spawning, color = average_snk)) + #gives plot dimensions
+  geom_point() + #scatterplot
+  geom_smooth(method ='glm.nb', se = F, color = 'darkgreen') + #Plots a Negative Binomial model onto the data
+  theme_classic()+
+  labs(x = 'How many times nesting male displayed courtship behavior (count)', y = 'Females that visited (count)', title = 'How many females visited as a function of nesting male courtship events') #Sets axis and title
+
+plot(fem.s.nmcourt)
+```
+
+## Female visits/spawning as a function of nesting male aggression
+
+## Female visits as a function of nesting male aggression
+
+```{r}
+fvisits.nmagg <- behavior_sheet_cln |>
+  #creates a variable that is a total of all NM agression
+  mutate('total_nm_agg' = nm_aggression_to_sat + nm_aggression_to_snk + nm_aggression_to_other_nm + nest_defence_nm_to_other_spp) |>
+  #Plotting previous variable to female visits
+  ggplot(aes(total_nm_agg, total_female_visits)) + #gives ggplot dimensions
+  geom_point() + #makes the plot a scatterplot
+  geom_smooth() + #adds a trendline for the plot
+  labs(x = 'Total Nesting Male Aggression Behaviors',
+       y = 'Total Female Visits',
+       title = 'Total Visits as Function of Total Nesting Male Aggression') + #Makes labels
+  theme_classic() + #Sets the plot visuals
+  theme(plot.title = element_text(hjust = 0.5)) #Moves title to the middle
+
+fvisits.nmagg
+```
+
+## Female spawning as a function of nesting male aggression
+
+```{r}
+f.spawns.nmagg <- behavior_sheet_cln |>
+  #creates a variable that is a total of all NM agression
+  mutate('total_nm_agg' = nm_aggression_to_sat + nm_aggression_to_snk + nm_aggression_to_other_nm + nest_defence_nm_to_other_spp) |>
+  #Plotting previous variable to female visits
+  ggplot(aes(total_nm_agg, total_female_spawning)) + #gives ggplot dimensions
+  geom_point() + #makes the plot a scatterplot
+  geom_smooth() + #adds a trendline for the plot
+  labs(x = 'Total Nesting Male Aggression Behaviors',
+       y = 'Total Female Spawns',
+       title = 'Total Spawns as Function of Total Nesting Male Aggression') + #Makes labels
+  theme_classic() + #Sets the plot visuals
+  theme(plot.title = element_text(hjust = 0.5)) #Moves title to the middle
+
+f.spawns.nmagg
+```
+
 # Models
 
 ### Generalized Linear Models
@@ -205,13 +276,104 @@ mean.var.table
 #### (Josh)Female visits as a function of Average Number of Sneakers
 
 ```{r}
+fv.avgsnkr1 <-
+  brm(data = behavior_sheet_cln, #Give the model the tibble
+      family = poisson(link = "log"), #Tell model what type of distribution
+      total_female_visits ~ average_snk, #Specifying the model
+      iter = 2000, warmup = 1000, chains = 4, cores = 4, #Markov chain parameters
+      seed = 4, #Determines which random numbers
+      file = 'Exploratory model outputs/fv.avgsnkr1') #saves it as an output
 
+summary(fv.avgsnkr1)
+plot(fv.avgsnkr1)
 ```
 
 #### (Josh)Female spawns as a function of Average number of sneakers
 
 ```{r}
+fs.avgsnkr <-
+  brm(data = behavior_sheet_cln, #Give the model the tibble
+      family = poisson(link="log"), #Tell model what type of distribution
+      total_spawns ~ average_snk, #Specifying the model
+      iter = 2000, warmup = 1000, chains = 4, cores = 4, #Markov chain parameters
+      seed = 4, #Determines which random numbers
+      file = 'Exploratory model outputs/fs.avgsnkr') #saves it as an output
 
+summary(fs.avgsnkr)
+plot(fs.avgsnkr)
+
+```
+
+### Female Visits/Spawns as a function of Nesting Male Courtship
+
+#### (Josh) Female visits as a function of nesting male courtship
+
+```{r}
+fv.nm.court <-
+  brm(data = behavior_sheet_cln, #Give the model the tibble
+      family = poisson(link = 'log'), #Tell model what type of distribution
+      total_female_visits ~ nm_courtship, #Specifying the model
+      iter = 2000, warmup = 1000, chains = 4, cores = 4, #Markov chain parameters
+      seed = 4, #Determines which random numbers
+      file = 'Exploratory model outputs/fv.nm.court') #saves it as an output
+
+summary(fv.nm.court)
+plot(fv.nm.court)
+```
+
+#### (Josh) Female spawning as a function of nesting male courtship
+
+```{r}
+fs.nm.court <-
+  brm(data = behavior_sheet_cln, #Give the model the tibble
+      family = poisson(link = 'log'), #Tell model what type of distribution
+      total_female_spawning ~ nm_courtship, #Specifying the model
+      iter = 2000, warmup = 1000, chains = 4, cores = 4, #Markov chain parameters
+      seed = 4, #Determines which random numbers
+      file = 'Exploratory model outputs/fs.nm.court') #saves it as an output
+
+summary(fs.nm.court)
+plot(fs.nm.court)
+```
+
+### Female visits/spawning as a function of nesting male aggression
+
+#### (Josh) Female visits as a function of nesting male aggression
+
+```{r}
+fvisits.nmagg <- behavior_sheet_cln |>
+  #creates a variable that is a total of all NM agression
+  mutate('total_nm_agg' = nm_aggression_to_sat + nm_aggression_to_snk + nm_aggression_to_other_nm + nest_defence_nm_to_other_spp)
+
+fvisits.nmagg.mdl1 <-
+  brm(data = fvisits.nmagg, #Give the model the tibble
+      family = negbinomial(link = 'log'), #Tell model what type of distribution
+      total_female_visits ~ total_nm_agg, #Specifying the model
+      iter = 2000, warmup = 1000, chains = 4, cores = 4, #Markov chain parameters
+      seed = 4, #Determines which random numbers
+      file = 'Exploratory model outputs/fvisits.nmagg.mdl1') #saves it as an output
+
+print(fvisits.nmagg.mdl1, digits = 4)
+plot(fvisits.nmagg.mdl1)
+```
+
+#### (Josh) Female spawning as a function of nesting male aggression
+
+```{r}
+f.spawns.nmagg <- behavior_sheet_cln |>
+  #creates a variable that is a total of all NM agression
+  mutate('total_nm_agg' = nm_aggression_to_sat + nm_aggression_to_snk + nm_aggression_to_other_nm + nest_defence_nm_to_other_spp)
+
+f.spawns.nmagg.mdl1 <-
+  brm(data = f.spawns.nmagg, #Give the model the tibble
+      family = negbinomial(link='log'), #Tell model what type of distribution
+      total_spawns ~ total_nm_agg, #Specifying the model
+      iter = 2000, warmup = 1000, chains = 4, cores = 4, #Markov chain parameters
+      seed = 4, #Determines which random numbers
+      file = 'Exploratory model outputs/f.visits.nmagg.mdl1') #saves it as an output
+
+print(f.spawns.nmagg.mdl1, digits = 4) #Gives a summary of the model
+plot(f.spawns.nmagg.mdl1) #Plots the chains
 ```
 
 ### Female spawns as a function of Her Interaction Pathway to the nest
