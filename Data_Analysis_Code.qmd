@@ -806,3 +806,9 @@ print(pathway.spawns.mdl.2, digits = 4)
 #Plots the Markov chains
 plot(pathway.spawns.mdl.2)
 ```
+
+# Session info
+
+```{r}
+sessionInfo()
+```

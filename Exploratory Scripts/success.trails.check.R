@@ -1,3 +1,6 @@
+#These are scrapped scripts that were being used to make sure the data was transformed correctly
+
+
 trial.success <- sheet.normalized.rmv |>
   mutate('y.more.n' = 
            case_when(
