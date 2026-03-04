@@ -1002,7 +1002,7 @@ plot(fs.avgsnkr)
 
 #### Varying Pathway's success rates
 
-###### This is scratch code for figuring out how to filter out inconsistent data 
+###### This is scratch code for figuring out how to filter out inconsistent data
 
 ```{r}
 nm.brought.path <- behavior_sheet_cln |>

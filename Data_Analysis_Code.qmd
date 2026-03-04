@@ -718,3 +718,91 @@ print(path.fem.spawning, digits = 4)
 #Plots the Markov chains
 plot(path.fem.spawning)
 ```
+
+Let's create a model that will inform us about each pathway.
+
+First we create the pathways
+
+```{r}
+pathway.spawns.modl <- behavior_sheet_cln |>
+  #Remove nests where there are data inconsistencies
+ filter_out((female_spawning_with_nm_brought_by_nm + female_spawning_with_only_sat_brought_by_nm) > (total_spawns_nm_brought + total_spawns_nm_brought_sat_only_spawn)) |>
+  filter_out((female_spawning_sat_brought + females_spawing_sat_brought_sat_only_spawn) > (total_spawns_sat_brought + total_spawns_sat_brought_sat_only_spawn)) |>
+  filter_out((female_spawning_sat_passed_to_nm + female_spawning_sat_passed_to_nm_but_only_sat_spawn) > (total_spawns_sat_passed_to_nm + total_spawns_sat_passed_to_nm_but_sat_only_spawn))|>
+  filter_out((female_spawning_snk_brought + female_spawning_snk_brought_skn_only_spawn) > (total_spawns_snk_brought + total_spawns_snk_brought_snk_only_spawn))|>
+   #Create new variables that account for the pathway's proportion
+  mutate(
+    'Nesting Male' = (total_spawns_nm_brought + total_spawns_nm_brought_sat_only_spawn),
+    'Satellite Male' = (total_spawns_sat_brought + total_spawns_sat_brought_sat_only_spawn),
+    'Satellite Pass' = (total_spawns_sat_passed_to_nm + total_spawns_sat_passed_to_nm_but_sat_only_spawn),
+    'Sneaker Male' = (total_spawns_snk_brought + total_spawns_snk_brought_snk_only_spawn)) |>
+  #Move the pathways columns we just created into their own column for inputting into the model
+  pivot_longer(cols = c(`Nesting Male`:`Sneaker Male`),
+               names_to = 'Pathway',
+               values_to = 'number.spawned')
+```
+
+Then we create the model, this is using the spawning as the
+
+```{r}
+pathway.spawns.mdl.1 <- pathway.spawns.modl |>
+  brm(
+    family = binomial(link = 'logit'), #Tell model what type of distribution
+    #Specifying the model
+    formula = bf(number.spawned | trials(total_spawns) ~ 0 + Pathway + (1|nest_name)),
+    prior = c(prior(normal(0, 2), class = b)),
+    iter = 4000, warmup = 1000, chains = 4, cores = 4, #Markov chain parameters
+      seed = 4, #Determines which random numbers
+      file = 'Data Analysis Outputs/pathway.spawns.mdl.1') #saves it as an output
+
+#Gives a plot of the model's predictions
+pp_check(pathway.spawns.mdl.1)
+#Gives us the summary of the model
+print(pathway.spawns.mdl.1, digits = 4)
+#Plots the Markov chains
+plot(pathway.spawns.mdl.1)
+```
+
+Now with visits
+
+```{r}
+pathway.visits.modl <- behavior_sheet_cln |>
+  #Remove nests where there are data inconsistencies
+  filter_out((female_spawning_with_nm_brought_by_nm + female_spawning_with_only_sat_brought_by_nm)/(total_female_spawning) > 1 ) |>
+  filter_out((female_spawning_sat_brought + females_spawing_sat_brought_sat_only_spawn)/(total_female_spawning) > 1) |>
+  filter_out((female_spawning_sat_passed_to_nm + female_spawning_sat_passed_to_nm_but_only_sat_spawn)/(female_visits_by_sat_passed_to_nm) > 1) |>
+  filter_out((female_spawning_snk_brought + female_spawning_snk_brought_skn_only_spawn)/(total_female_spawning) > 1)|>
+  #Create new variables that account for the pathway's proportion
+  mutate(
+    'Nesting Male' = (female_spawning_with_nm_brought_by_nm + female_spawning_with_only_sat_brought_by_nm),
+    'Satellite Male' = (female_spawning_sat_brought + females_spawing_sat_brought_sat_only_spawn),
+    'Satellite Male Pass' = (female_spawning_sat_passed_to_nm + female_spawning_sat_passed_to_nm_but_only_sat_spawn),
+    'Sneaker Male' = (female_spawning_snk_brought + female_spawning_snk_brought_skn_only_spawn)
+  ) |>
+  #Move the pathways columns we just created into their own column for inputting into the model
+  pivot_longer(cols = c(`Nesting Male`:`Sneaker Male`),
+               names_to = 'Pathway',
+               values_to = 'number.spawned')
+  
+```
+
+Model
+
+```{r}
+pathway.spawns.mdl.2 <- pathway.visits.modl |>
+  brm(
+    family = binomial(link = 'logit'), #Tell model what type of distribution
+    #Specifying the model
+    formula = bf(number.spawned | trials(total_female_visits) ~ 0 + Pathway + (1|nest_name)),
+    prior = c(prior(normal(0, 2), class = b)),
+    iter = 4000, warmup = 1000, chains = 4, cores = 4, #Markov chain parameters
+      seed = 4, #Determines which random numbers
+      file = 'Data Analysis Outputs/pathway.spawns.mdl.2') #saves it as an output
+
+#Gives a plot of the model's predictions
+pp_check(pathway.spawns.mdl.2)
+#Gives us the summary of the model
+print(pathway.spawns.mdl.2, digits = 4)
+#Plots the Markov chains
+plot(pathway.spawns.mdl.2)
+```
