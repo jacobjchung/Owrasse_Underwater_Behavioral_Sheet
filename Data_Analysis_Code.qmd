@@ -858,8 +858,8 @@ plot(ggpredict(pathway.spawns.mdl.nest, # Tells the data
      )) + 
   theme(legend.position = "none") + #Removes any legend
   theme_classic() + # Sets the overall theme
-  labs(y = 'Number of females that spawned',
-       title = 'Predicted Successes of Number of Females that spawned') + #Adjust axis and title
+  labs(y = 'Probability of Spawning',
+       title = 'Predicted Spawning Success for each pathway') + #Adjust axis and title
   theme(plot.title = element_text(hjust = 0.5)) #Moves title to the middle
 ```
 
