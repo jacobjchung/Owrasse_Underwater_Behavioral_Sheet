@@ -127,6 +127,8 @@ our system (this is still a work in progress!).
 More.indepth.model.testing.qmd contains some further generalized linear
 mixed models that we have tried whille exploring our data.
 
+The data used for our analysis can be found in UW_Nest_Behavioral_Sheets_Cleaned.xlsx, where there is a second tab that includes our metadata!
+
 ## References
 
 Rosenthal, G . (2017). Mate Choice: The Evolution of Sexual Decision
