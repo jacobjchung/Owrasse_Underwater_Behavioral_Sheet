@@ -635,8 +635,8 @@ pathways.success.rate.total <- behavior_sheet_cln |>
   #Makes the graph a bar graph
   geom_col() +
   labs(x = 'Pathway', 
-       y = 'Success rate',
-       title = "The Proportion of Total Females that spawned for each Visitation Pathway",) + #edits axis and title labels
+       y = 'Proportion Spawned',
+       title = "The Proportion of Total Females that Spawned for each Visitation Pathway",) + #edits axis and title labels
   theme_classic() + #Sets the plot visuals
   #Adds a color scheme to the plot
   scale_fill_manual(values = c('Nesting Male' = '#065143', 'Satellite Male' = '#db5a42', 'Satellite Male Pass' = '#7A9B76','Sneaker Male' = '#1481BA')) +
