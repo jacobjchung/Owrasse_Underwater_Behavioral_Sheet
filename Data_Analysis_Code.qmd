@@ -566,6 +566,8 @@ pathways.visits
 
 Now let's plot the success rate of each pathway:
 
+distinct() \|\>
+
 ```{r}
 pathways.success.rate <- behavior_sheet_cln |>
   #Remove nests where there are data inconsistencies
