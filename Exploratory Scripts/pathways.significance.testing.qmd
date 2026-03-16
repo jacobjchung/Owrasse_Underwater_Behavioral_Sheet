@@ -76,6 +76,8 @@ year_date <- as.character(behavior_sheet_cln$year) #Creates a vector with years 
 behavior_sheet_cln$year <- year_date #creates a new variable for ease of graphing later on
 ```
 
+## Different Pathways success rate and total spawns
+
 Let's now create the variables that we are interested in.
 
 ```{r}
@@ -159,10 +161,127 @@ Spawning success as a function of total female visits when brought by a sneaker
 ```{r}
 ggplot(sig.pathway.dif, aes(female_visit_by_snk, snk.spawn.sucessrate)) +
   geom_point() + #Sets the type of graph
-  #geom_smooth( method = 'lm') + #Adds a trendline
+  geom_smooth( method = 'lm') + #Adds a trendline
   theme_classic() + #Sets the plot visuals
   labs(title = 'Spawning success when a Sneaker male brings a female',
         x = 'Number of females brought by a Sneaker',
        y = 'Spawning success rate') + # Labels the axes
   theme(plot.title = element_text(hjust = 0.5)) #Moves title to the middle
 ```
+
+An average of the total number of times a female spawns when brought by the nesting male
+
+```{r}
+ggplot(sig.pathway.dif, aes(x = (female_spawning_with_nm_brought_by_nm + female_spawning_with_only_sat_brought_by_nm), y = nm.tfspawn)) +
+  geom_point() + #Sets the type of graph
+  geom_smooth( method = 'lm') + #Adds a trendline
+  theme_classic() + #Sets the plot visuals
+  labs(title = 'Average number of times a female spawns when brought by the Nesting Male',
+        x = 'Number of females that spawned when brought by a Nesting Male',
+       y = 'Amount of times a female spawned') + # Labels the axes
+  theme(plot.title = element_text(hjust = 0.5)) #Moves title to the middle
+```
+
+An average of the total number of times a female spawns when brought by the satellite male
+
+```{r}
+ggplot(sig.pathway.dif, aes(x = (female_spawning_sat_brought + females_spawing_sat_brought_sat_only_spawn), y = sat.tfspawn)) +
+  geom_point() + #Sets the type of graph
+  geom_smooth( method = 'lm') + #Adds a trendline
+  theme_classic() + #Sets the plot visuals
+  labs(title = 'Average number of times a female spawns when brought by the Satellite Male',
+        x = 'Number of females that spawned when brought by a Satellite Male',
+       y = 'Amount of times a female spawned') + # Labels the axes
+  theme(plot.title = element_text(hjust = 0.5)) #Moves title to the middle
+```
+
+Total amount of spawns per female when brought by the satellite and passed to the nesting male
+
+```{r}
+ggplot(sig.pathway.dif, aes(x = (female_spawning_sat_brought + females_spawing_sat_brought_sat_only_spawn), y = satpass.tfspawn)) +
+  geom_point() + #Sets the type of graph
+  geom_smooth( method = 'lm') + #Adds a trendline
+  theme_classic() + #Sets the plot visuals
+  labs(title = 'Average number of times a female spawns when passed by the Satellite Male',
+        x = 'Number of females that spawned when passed by a Satellite Male',
+       y = 'Amount of times a female spawned') + # Labels the axes
+  theme(plot.title = element_text(hjust = 0.5)) #Moves title to the middle
+```
+
+Total amount of spawns per female when brought by the sneaker
+
+```{r}
+ggplot(sig.pathway.dif, aes(x = (female_spawning_snk_brought + female_spawning_snk_brought_skn_only_spawn), y = snk.tfspawn)) +
+  geom_point() + #Sets the type of graph
+  geom_smooth( method = 'lm') + #Adds a trendline
+  theme_classic() + #Sets the plot visuals
+  labs(title = 'Average number of times a female spawns when brought by the Sneaker Male',
+        x = 'Number of females that spawned when brought by a Sneaker Male',
+       y = 'Amount of times a female spawned') + # Labels the axes
+  theme(plot.title = element_text(hjust = 0.5)) #Moves title to the middle
+```
+
+Now we are going to run some significance testing between the pathways for spawning success and total number of female spawns, so let's get the tibbles we are going to use
+
+```{r}
+#We are going to move the columns (our variables) under 1 column for easier analysis
+sig.pathway.dif.tspawn.selected <- sig.pathway.dif |>
+  #select only for the columns we want
+  dplyr::select(nm.tfspawn:snk.tfspawn) |>
+  #Pivot the colomns into rows
+  pivot_longer(nm.tfspawn:snk.tfspawn,
+               names_to = 'pathway.total',
+               values_to = 'total.spawns')
+
+sig.pathway.dif.successrate.selected <- sig.pathway.dif |>
+   #select only for the columns we want
+  dplyr::select(nm.fspawn.sucessrate:snk.spawn.sucessrate) |>
+   #Pivot the colomns into rows
+  pivot_longer(nm.fspawn.sucessrate:snk.spawn.sucessrate,
+               names_to = 'pathway.successrate',
+               values_to = 'successrate')
+```
+
+Now let's run some Kruskal-Wallis tests (we run this type because our data is not normally distributed thus ANOVAs wouldn't fit. It uses sample medians instead of sample means to compare groups like an ANOVA does). Before, let's get some descriptive statistics
+
+```{r}
+group_by(sig.pathway.dif.successrate.selected, pathway.successrate) %>%
+  summarise(
+    count = n(),
+    mean = mean(successrate, na.rm = FALSE),
+    sd = sd(successrate, na.rm = FALSE),
+    median = median(successrate, na.rm = FALSE),
+    IQR = IQR(successrate, na.rm = FALSE)
+  )
+
+group_by(sig.pathway.dif.tspawn.selected, pathway.total) %>%
+  summarise(
+    count = n(),
+    mean = mean(total.spawns, na.rm = FALSE),
+    sd = sd(total.spawns, na.rm = FALSE),
+    median = median(total.spawns, na.rm = FALSE),
+    IQR = IQR(total.spawns, na.rm = FALSE)
+  )
+```
+
+Now let's run the test
+
+```{r}
+#Run the Kruskal test
+kruskal.test(successrate ~ pathway.successrate, data = sig.pathway.dif.successrate.selected)
+#Now run a Wilcoxon rank sum test to see differences between pathways
+pairwise.wilcox.test(sig.pathway.dif.successrate.selected$successrate, sig.pathway.dif.successrate.selected$pathway.successrate, p.adjust.method = 'BH')
+```
+
+```{r}
+#Run the Kruskal test
+kruskal.test(total.spawns ~ pathway.total, data = sig.pathway.dif.tspawn.selected)
+#Now run a Wilcoxon rank sum test to see differences between pathways
+pairwise.wilcox.test(sig.pathway.dif.tspawn.selected$total.spawns, sig.pathway.dif.tspawn.selected$pathway.total, p.adjust.method = 'BH')
+```
+
+What this tells us is that the sat, sat passing, and sneaker pathways are significantly different from the nm pathway. Neither sat pathway is significant from the other. And the sneaker path is significantly different from all of them. While this is joyous results, it is very helpful for us and will allow us to think about our data in new ways.
+
+## Brms modeling
+
+While our previous work tells us that the pathways are not significantly different (other than the nesting male pathway), we are still interested in the pathways and can build some models looking at our data! For this section, we will be using Bayesian statistics, rather than frequentest (purely because I was taught R modeling with Bayesian stats).
