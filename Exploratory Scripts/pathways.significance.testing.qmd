@@ -242,6 +242,110 @@ sig.pathway.dif.successrate.selected <- sig.pathway.dif |>
                values_to = 'successrate')
 ```
 
+Let's check the shape of the pathway distributions, this will inform us with what tests and distributions we are going to run.
+
+Nesting Male Success rate distribution
+
+```{r}
+ggplot(sig.pathway.dif, aes(sig.pathway.dif$nm.fspawn.sucessrate)) +
+  geom_histogram() + #Sets the type of graph
+  theme_classic() + #Sets the plot visuals
+  labs(title = 'Nesting Male success rate distribution',
+        x = 'Nesting male success rate',
+       y = 'Count') + # Labels the axes
+  theme(plot.title = element_text(hjust = 0.5)) #Moves title to the middle
+  
+```
+
+Satellite Male success rate
+
+```{r}
+ggplot(sig.pathway.dif, aes(sig.pathway.dif$sat.fspawn.sucessrate)) +
+  geom_histogram() + #Sets the type of graph
+  theme_classic() + #Sets the plot visuals
+  labs(title = 'Satellite Male success rate distribution',
+        x = 'Satellite male success rate',
+       y = 'Count') + # Labels the axes
+  theme(plot.title = element_text(hjust = 0.5)) #Moves title to the middle
+```
+
+Satellite Male passing success rate
+
+```{r}
+ggplot(sig.pathway.dif, aes(sig.pathway.dif$satpass.fspawn.sucessrate)) +
+  geom_histogram() + #Sets the type of graph
+  theme_classic() + #Sets the plot visuals
+  labs(title = 'Satellite Male Passing success rate distribution',
+        x = 'Satellite male passing success rate',
+       y = 'Count') + # Labels the axes
+  theme(plot.title = element_text(hjust = 0.5)) #Moves title to the middle
+```
+
+Sneaker success rate
+
+```{r}
+ggplot(sig.pathway.dif, aes(sig.pathway.dif$snk.spawn.sucessrate)) +
+  geom_histogram() + #Sets the type of graph
+  theme_classic() + #Sets the plot visuals
+  labs(title = 'Sneaker Male success rate distribution',
+        x = 'Sneaker male passing success rate',
+       y = 'Count') + # Labels the axes
+  theme(plot.title = element_text(hjust = 0.5)) #Moves title to the middle
+```
+
+Nesting Male total spawns distribution
+
+```{r}
+ggplot(sig.pathway.dif, aes(sig.pathway.dif$nm.tfspawn)) +
+  geom_histogram() + #Sets the type of graph
+  theme_classic() + #Sets the plot visuals
+  labs(title = 'Nesting Male total spawns distribution',
+        x = 'Nesting male total spawns',
+       y = 'Count') + # Labels the axes
+  theme(plot.title = element_text(hjust = 0.5)) #Moves title to the middle
+  
+```
+
+Satellite Male total spawns distribution
+
+```{r}
+ggplot(sig.pathway.dif, aes(sig.pathway.dif$sat.tfspawn)) +
+  geom_histogram() + #Sets the type of graph
+  theme_classic() + #Sets the plot visuals
+  labs(title = 'Satellite Male total spawns distribution',
+        x = 'Satellite male total spawns',
+       y = 'Count') + # Labels the axes
+  theme(plot.title = element_text(hjust = 0.5)) #Moves title to the middle
+```
+
+Satellite male passing total spawns
+
+```{r}
+ggplot(sig.pathway.dif, aes(sig.pathway.dif$satpass.tfspawn)) +
+  geom_histogram() + #Sets the type of graph
+  theme_classic() + #Sets the plot visuals
+  labs(title = 'Satellite Male passes total spawns distribution',
+        x = 'Satellite male passes total spawns',
+       y = 'Count') + # Labels the axes
+  theme(plot.title = element_text(hjust = 0.5)) #Moves title to the middle
+```
+
+Sneaker male total spawns
+
+```{r}
+ggplot(sig.pathway.dif, aes(sig.pathway.dif$snk.tfspawn)) +
+  geom_histogram() + #Sets the type of graph
+  theme_classic() + #Sets the plot visuals
+  labs(title = 'Sneaker Male total spawns distribution',
+        x = 'Sneaker male total spawns',
+       y = 'Count') + # Labels the axes
+  theme(plot.title = element_text(hjust = 0.5)) #Moves title to the middle
+```
+
+\
+\
+\
+
 Now let's run some Kruskal-Wallis tests (we run this type because our data is not normally distributed thus ANOVAs wouldn't fit. It uses sample medians instead of sample means to compare groups like an ANOVA does). Before, let's get some descriptive statistics
 
 ```{r}
@@ -285,3 +389,60 @@ What this tells us is that the sat, sat passing, and sneaker pathways are signif
 ## Brms modeling
 
 While our previous work tells us that the pathways are not significantly different (other than the nesting male pathway), we are still interested in the pathways and can build some models looking at our data! For this section, we will be using Bayesian statistics, rather than frequentest (purely because I was taught R modeling with Bayesian stats).
+
+First, let's look to see if there is a relationship between the pathway that a female visits and the chance of her spawning. For this, we are going to run 2 different models. First, we will simply count the number of females that spawn in each pathway and run a negative binomial model. This should tell us the how the number of females that spawn in each pathway increases with each 1 visit of each pathway.
+
+```{r}
+path.fspawning.nb <- behavior_sheet_cln |>
+    #Remove nests where there are data inconsistencies
+  filter_out((female_spawning_with_nm_brought_by_nm + female_spawning_with_only_sat_brought_by_nm)/(total_female_spawning) > 1 ) |>
+  filter_out((female_spawning_sat_brought + females_spawing_sat_brought_sat_only_spawn)/(total_female_spawning) > 1) |>
+  filter_out((female_spawning_sat_passed_to_nm + female_spawning_sat_passed_to_nm_but_only_sat_spawn)/(female_visits_by_sat_passed_to_nm) > 1) |>
+  filter_out((female_spawning_snk_brought + female_spawning_snk_brought_skn_only_spawn)/(total_female_spawning) > 1)|>
+  #Create new variables that account for the pathway's successes
+  mutate(
+    'nm.path' = (female_spawning_with_nm_brought_by_nm + female_spawning_with_only_sat_brought_by_nm),
+    'sat.path' = (female_spawning_sat_brought + females_spawing_sat_brought_sat_only_spawn),
+    'sat.pass.path' = (female_spawning_sat_passed_to_nm + female_spawning_sat_passed_to_nm_but_only_sat_spawn),
+    'snk.path' = (female_spawning_snk_brought + female_spawning_snk_brought_skn_only_spawn)
+  ) |>
+  #Move the pathways columns we just created into their own column for inputting into the model
+  pivot_longer(cols = c(nm.path:snk.path),
+               names_to = 'Pathway',
+               values_to = 'number.spawned')
+
+path.fspawning.nb.mdl1 <- brm(data = path.fspawning.nb,
+      family = negbinomial(link = 'log'), # Sets the models distribution
+      number.spawned ~ 0 + `Pathway` + (1 | nest_name), # Gives the model the formula
+      iter = 4000, warmup = 1000, chains = 4, cores = 4, #Markov chain parameters
+      seed = 4, #Determines which random numbers
+    sample_prior = 'yes', #Allows us to run hypothesis tests of the different Pathways
+      file = 'Exploratory model outputs/path.fspawning.nb.mdl1') #saves it as an output
+
+#Gives a plot of the model's predictions
+pp_check(path.fspawning.nb.mdl1)
+#Gives us the summary of the model
+print(path.fspawning.nb.mdl1, digits = 4)
+#Plots the Markov chains
+plot(path.fspawning.nb.mdl1)
+```
+
+Then, we will run a model with the response variable being the probability of a female spawning for each individual pathway using a binomial model, which will tell us the probability of a female spawning based on our data.
+
+```{r}
+pathway.fspawns.mdl.b <- brm( data = path.fspawning.nb,
+    family = binomial(link = 'logit'), #Tell model what type of distribution
+    #Specifying the model
+    formula = bf(number.spawned | trials(total_female_visits) ~ 0 + Pathway + (1|nest_name)),
+    iter = 4000, warmup = 1000, chains = 4, cores = 4, #Markov chain parameters
+      seed = 4, #Determines which random numbers
+    sample_prior = 'yes', #Allows us to run hypothesis tests of the different Pathways
+      file = 'Exploratory model outputs/pathway.fspawns.mdl.b') #saves it as an output
+
+#Gives a plot of the model's predictions
+pp_check(pathway.fspawns.mdl.b)
+#Gives us the summary of the model
+print(pathway.fspawns.mdl.b, digits = 4)
+#Plots the Markov chains
+plot(pathway.fspawns.mdl.b)
+```
